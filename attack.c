@@ -1,6 +1,7 @@
 //attack.c
 
 #include "header.h"
+#include <stdio.h>
 
 const int kndir[8] = { -8,-19,-21,-12,8,19,21,12};
 const int rkdir[4] = {-1,-10,1,10};
@@ -10,7 +11,11 @@ const int kidir[8] = {-1,-10,1,10,-9,-11,11,9};
 int sqattacked(const int sq, const int side, const S_BOARD *pos)
 {
   int pce,i,t_sq,dir;
-  
+
+  ASSERT(sqonboard(sq));
+  ASSERT(sidevalid(side));
+  ASSERT(checkboard(pos));
+
   //pawns
   if(side==WHITE)
   {

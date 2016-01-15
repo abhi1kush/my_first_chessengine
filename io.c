@@ -43,3 +43,19 @@ char *prmove(const int move)
   
   return mvstr; 
 }
+
+void printmovelist(const S_MOVELIST *list)
+{
+  int i =0;
+  int score =0;
+  int move =0;
+  printf("MoveList:%d\n",list->count);
+  
+  for(i=0; i < list->count ; i++)
+  {
+    move = list->moves[i].move;
+    score = list->moves[i].score;
+    printf("Move:%d > %s (score:%d)\n",i+1,prmove(move),score);
+  }
+  printf("MoveList Total %d Moves:\n\n",list->count);
+}

@@ -28,13 +28,13 @@
 #define MOVE(f,t,ca,pro,f1) ((f)|((t)<<7)|((ca)<<14)|((pro)<<20)|(f1))
 #define SQOFFBOARD(sq) (filesbrd[(sq)]==OFFBOARD)
 
-int loopslidepce[8]= {wb,wr,wq,0,bb,br,bq,0};
-int loopslideindex[2]={0,4};
+const int loopslidepce[8]= {wb,wr,wq,0,bb,br,bq,0};
+const int loopslideindex[2]={0,4};
 
-int loopnonslidepce[6]={wn,wk,0,bn,bk,0};
-int loopnonslideindex[2]={0,3};
+const int loopnonslidepce[6]={wn,wk,0,bn,bk,0};
+const int loopnonslideindex[2]={0,3};
 
-int pcedir[13][8] = {
+const int pcedir[13][8] = {
   { 0, 0, 0, 0, 0, 0, 0 },
   { 0, 0, 0, 0, 0, 0, 0 },
   { -8, -19,  -21, -12, 8, 19, 21, 12 },
@@ -50,32 +50,31 @@ int pcedir[13][8] = {
   { -1, -10,  1, 10, -9, -11, 11, 9 }
 };
 
-int numdir[13] = {0,0,8,4,4,8,8,0,8,4,4,8,8};
+const int numdir[13] = {0,0,8,4,4,8,8,0,8,4,4,8,8};
 
 
-
-void addquietmove(const S_BOARD *pos,int move, S_MOVELIST *list)
+static void addquietmove(const S_BOARD *pos,int move, S_MOVELIST *list)
 {
   list->moves[list->count].move = move;
   list->moves[list->count].score = 0;
   list->count++;
 }
 
-void addcapturemove(const S_BOARD *pos,int move, S_MOVELIST *list)
+static void addcapturemove(const S_BOARD *pos,int move, S_MOVELIST *list)
 {
   list->moves[list->count].move = move;
   list->moves[list->count].score = 0;
   list->count++;
 }
 
-void addenpassntmove(const S_BOARD *pos,int move, S_MOVELIST *list)
+static void addenpassntmove(const S_BOARD *pos,int move, S_MOVELIST *list)
 {
   list->moves[list->count].move = move;
   list->moves[list->count].score = 0;
   list->count++;
 }
 
-void addwhitepawncapmove(const S_BOARD *pos, const int from , const int to, const int cap, S_MOVELIST * list)
+static void addwhitepawncapmove(const S_BOARD *pos, const int from , const int to, const int cap, S_MOVELIST * list)
 {
   ASSERT(piecevalidempty(cap));
   ASSERT(sqonboard(from));
@@ -92,7 +91,7 @@ void addwhitepawncapmove(const S_BOARD *pos, const int from , const int to, cons
     addcapturemove(pos,MOVE(from,to,cap,EMPTY,0),list);
 }
 
-void addwhitepawnmove(const S_BOARD *pos, const int from , const int to, S_MOVELIST * list)
+static void addwhitepawnmove(const S_BOARD *pos, const int from , const int to, S_MOVELIST * list)
 {
   ASSERT(sqonboard(from));
   ASSERT(sqonboard(to));
@@ -107,7 +106,7 @@ void addwhitepawnmove(const S_BOARD *pos, const int from , const int to, S_MOVEL
     addcapturemove(pos,MOVE(from,to,EMPTY,EMPTY,0),list);
 }
 
-void addblackpawncapmove(const S_BOARD *pos, const int from , const int to, const int cap, S_MOVELIST * list)
+static void addblackpawncapmove(const S_BOARD *pos, const int from , const int to, const int cap, S_MOVELIST * list)
 {
   ASSERT(piecevalidempty(cap));
   ASSERT(sqonboard(from));
@@ -123,7 +122,7 @@ void addblackpawncapmove(const S_BOARD *pos, const int from , const int to, cons
     addcapturemove(pos,MOVE(from,to,cap,EMPTY,0),list);
 }
 
-void addblackpawnmove(const S_BOARD *pos, const int from , const int to, S_MOVELIST * list)
+static void addblackpawnmove(const S_BOARD *pos, const int from , const int to, S_MOVELIST * list)
 {
   ASSERT(sqonboard(from));
   ASSERT(sqonboard(to));
@@ -152,7 +151,7 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
   int i =0;
   int pceindex =0;
 
-  printf("\n\n Side: %d\n",side);
+  //printf("\n\n Side: %d\n",side);
 
   if(side == WHITE)
   {
@@ -286,7 +285,8 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
             }
             break;
           }
-          printf("\t\tNormal on %s\n",prsq(t_sq));
+          //printf("\t\tNormal on %s\n",prsq(t_sq));
+          addquietmove(pos,MOVE(sq,t_sq,EMPTY,EMPTY,0),list);
           t_sq += dir;
         }
       }
@@ -325,7 +325,8 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
             addcapturemove(pos,MOVE(sq,t_sq,pos->pieces[t_sq],EMPTY,0),list);}
           continue;
         }
-        printf("\t\tNormal on %s \n",prsq(t_sq));
+        //printf("\t\tNormal on %s \n",prsq(t_sq));
+        addquietmove(pos,MOVE(sq,t_sq,EMPTY,EMPTY,0),list);
       }
     }
     pce = loopnonslidepce[pceindex++];

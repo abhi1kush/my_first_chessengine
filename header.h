@@ -151,6 +151,7 @@ extern int piecemaj[13];
 extern int piecemin[13];
 extern int pieceval[13];
 extern int piececol[13];
+extern int piecepawn[13];
 
 extern int filesbrd[SQ_NUM];
 extern int ranksbrd[SQ_NUM];

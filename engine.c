@@ -14,7 +14,7 @@
 
 int main()
 {
-  int i=0, move=0 , from =A2, to =H7, cap =wr, prom = bn;
+  int i=0, from =A2, to =H7, cap =wr, prom = bn;
   
   Allinit();
   S_BOARD board[1];
@@ -26,6 +26,23 @@ int main()
   //printboard(board);
   
   generateallmoves(board,list);
+
+  int movenum =0;
+  int move =0;
+    printboard(board);
+  
+  for(movenum =0;movenum< list->count; movenum++)
+  {
+    move = list->moves[movenum].move;
+    if(!makemove(board,move))
+      continue;
+    printf("\nMADE:%s\n",prmove(move));
+    takemove(board);
+    printf("\nTAKEN:%s\n",prmove(move));
+    printboard(board);
+
+    getchar();
+  }
 
   printmovelist(list);
 

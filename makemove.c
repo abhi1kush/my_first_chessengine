@@ -285,6 +285,64 @@ if(sqattacked(pos->kingsq[side],pos->side,pos))
 
 return TRUE;
 
-
 }
 
+void takemove(S_BOARD *pos )
+{
+  ASSERT(checkboard(pos));
+
+  pos->historyply--;
+  pos->ply--;
+
+  int move = pos->history[pos->historyply].move;
+  int from = FROMSQ(move);
+  int to = TOSQ(move);
+
+  ASSERT(sqonboard(from));
+  ASSERT(sqonboard(to));
+
+  if(pos->enpass != NO_SQ)
+    HASH_EP;
+  HASH_CA;
+
+  pos->side ^=1;
+  HASH_SIDE;
+
+  if(MFLAGEP & move)
+  {
+    if(pos->side == WHITE)
+      addpiece(to-10,pos,bp);
+    else
+      addpiece(to+10,pos,wp);
+  }
+  else if(MFLAGCA & move)
+  {
+    switch(to)
+    {
+      case C1 : movepiece(D1,A1,pos);break;
+      case C8: movepiece(D8,A8,pos);break;
+      case G1: movepiece(F1,H1,pos);break;
+      case G8: movepiece(F8,H8,pos);break;
+      default : ASSERT(FALSE); 
+    }
+  }
+  movepiece(to,from,pos);
+  if(pieceking[pos->pieces[from]])
+    pos->kingsq[pos->side] = from;
+
+  int captured = CAPTURED(move);
+  if (captured != EMPTY)
+  {
+    ASSERT(piecevalid(captured));
+    addpiece(to,pos,captured);
+  }
+  
+  if(PROMOTED(move) != EMPTY)
+  {
+    ASSERT(piecevalid(PROMOTED(move)) && !piecepawn[PROMOTED(move)]);
+    clearpiece(from,pos);
+    addpiece(from,pos,(piececol[PROMOTED(move)] == WHITE ? wp : bp));
+  }
+  ASSERT(checkboard(pos));
+
+}

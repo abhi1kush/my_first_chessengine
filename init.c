@@ -74,10 +74,13 @@ void inithashkeys()
 {
   int i=0;
   int i2=0;
+  
+  sidekey=RAND_64;
+  
   for(i=0;i<13;i++)
     for(i2=0;i2<120;i2++)
       piecekeys[i][i2]= RAND_64;
-  sidekey=RAND_64;
+  
   for(i=0;i<16;i++)
     castlekeys[i]=RAND_64;
 }

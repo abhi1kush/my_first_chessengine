@@ -1,0 +1,56 @@
+main()
+      \
+       { Allinit()
+                \
+                {
+                  initsq120to64();
+                  initbitmasks();
+                  inithashkeys();
+                  initfilsbrd();
+                }
+        parse_fen(FEN,board)
+                            \
+                            {
+                              resetboard(pos);
+                              updatematerial(pos);
+                            }
+        generateallmoves(board,list)
+                                    \
+                                    {
+                                      ASSERT(checkboard(pos));
+                                                              \
+                                                              {ASSERT(generateposkey(pos))}
+                                      addwhitepawnmoves()
+                                      addwhitepawncapmove()
+                                                           \
+                                                           {
+                                                             ASSERT(piecevalidempty(cap))
+                                                             ASSERT(sqonboard(from))
+                                                             ASSERT(sqonboard(to))
+                                                             addcapturemove()iiiiiiiiiiiiiiii
+                                                           }
+                                      addcapturemove()
+                                      
+                                      addblackpawnmoves()
+                                      addblackpawncapmove()
+                                      
+                                      addcapturemove()
+                                      addquietemove()
+                                      sqattacked()
+                                      addquietemove()
+                                     
+                                     ASSERT(sqonboard(sq));
+                                    }
+        
+        printboard(board)
+        printmovelist(list)
+        for{{
+            makemove(board,move)
+            prmove(move)
+            takemove(board)
+            prmove()
+            printboard(board)
+           }}
+        getchar()
+       }
+

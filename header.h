@@ -1,3 +1,4 @@
+//header.h
 #ifndef DEFS_H
 #define DEFS_H
 #include "stdlib.h"
@@ -14,6 +15,7 @@
     printf("At %s ",__TIME__); \
     printf("IN File %s ",__FILE__); \
     printf("At Line %d\n ",__LINE__); \
+    printf("In function %s\n ",__func__); \
     exit(1);}
 #endif
 

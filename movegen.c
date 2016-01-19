@@ -139,6 +139,7 @@ static void addblackpawnmove(const S_BOARD *pos, const int from , const int to, 
 
 void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
 {
+  printf("generate checkboard assert");
   ASSERT(checkboard(pos));
 
   list->count = 0;

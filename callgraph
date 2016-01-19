@@ -27,18 +27,29 @@ main()
                                                              ASSERT(piecevalidempty(cap))
                                                              ASSERT(sqonboard(from))
                                                              ASSERT(sqonboard(to))
-                                                             addcapturemove()iiiiiiiiiiiiiiii
+                                                             addcapturemove()
                                                            }
-                                      addcapturemove()
-                                      
-                                      addblackpawnmoves()
+                                      addcapturemove()                                      addblackpawnmoves()
                                       addblackpawncapmove()
-                                      
-                                      addcapturemove()
+                                                           \
+                                                           {
+                                                             ASSERT(piecevalidempty(cap))
+                                                             ASSERT(sqonboard(from))
+                                                             ASSERT(sqonboard(to))
+                                                             addcapturemove()
+                                                           }                                      addcapturemove()
                                       addquietemove()
                                       sqattacked()
+                                                  \
+                                                  {
+                                                    ASSERT(sqonboard(sq));
+                                                    ASSERT(sidevalid(side));
+                                                    ASSERT(checkboard(pos));
+                                                                           \
+                                                                            {ASSERT(generateposkey(pos))}
+                                                                          
+                                                  }
                                       addquietemove()
-                                     
                                      ASSERT(sqonboard(sq));
                                     }
         
@@ -46,7 +57,29 @@ main()
         printmovelist(list)
         for{{
             makemove(board,move)
+                                \
+                                {
+                                
+                                  ASSERT(checkboard(pos));
+                                                         \
+                                                          {ASSERT(generateposkey(pos))}
+                                  ASSERT(sqonboard(sq));
+                                  ASSERT(sidevalid(side));
+                                  ASSERT(piecevalid(pos->pieces[from]));
+                                  clearpiece(to,pos);
+                                  movepiece(from,to,pos);
+                                  addpiece(to,pos,prompce);
+                                  ASSERT(checkboard(pos));
+                                                         \
+                                                          {ASSERT(generateposkey(pos))}
+                                  sqattacked(pos->kingsq[side],pos->side,pos);
+                                }
             prmove(move)
+                        \
+                        {
+                          filesbrd();
+                          ranksbrd();
+                        }
             takemove(board)
             prmove()
             printboard(board)

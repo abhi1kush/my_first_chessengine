@@ -126,7 +126,7 @@ static void addpiece(const int sq, S_BOARD *pos,const int pce)
   else
   {
     setbit(pos->pawns[col],SQ64(sq));
-    setbit(pos->pawns[col],SQ64(sq));
+    setbit(pos->pawns[BOTH],SQ64(sq));
   }
   pos->material[col] += pieceval[pce];
   pos->plist[pce][pos->pceNum[pce]++] = sq;
@@ -175,6 +175,7 @@ static void movepiece(const int from,const int to, S_BOARD *pos)
 
 int makemove(S_BOARD *pos,int move)
 {
+  printf("makemove assert checkboard");
   ASSERT(checkboard(pos));
 int from = FROMSQ(move);
 int to = TOSQ(move);
@@ -202,7 +203,7 @@ else if(move & MFLAGCA)
       movepiece(A1,D1,pos);
       break;
     case C8:
-      movepiece(A1,D1,pos);
+      movepiece(A8,D8,pos);
       break;
     case G1:
       movepiece(H1,F1,pos);
@@ -275,11 +276,13 @@ if(pieceking[pos->pieces[to]])
 
   pos->side ^= 1;
   HASH_SIDE;
+  printf("checkboard in movepiece");
   ASSERT(checkboard(pos));
 
 if(sqattacked(pos->kingsq[side],pos->side,pos))
 { 
   //king in check still after move
+  takemove(pos);
   return FALSE;
 }
 
@@ -289,6 +292,7 @@ return TRUE;
 
 void takemove(S_BOARD *pos )
 {
+  printf("checkboard in takemove");
   ASSERT(checkboard(pos));
 
   pos->historyply--;
@@ -300,13 +304,22 @@ void takemove(S_BOARD *pos )
 
   ASSERT(sqonboard(from));
   ASSERT(sqonboard(to));
+  
+  printf("second last checkboard in makemove.c\n current ***** poskey %llx\n",pos->poskey);
+  ASSERT(checkboard(pos));
 
   if(pos->enpass != NO_SQ)
+  {
     HASH_EP;
+    printf("after hashep current ***** poskey %llx\n",pos->poskey);
+  }
   HASH_CA;
+  printf("after hashca current ***** poskey %llx\n",pos->poskey);
 
   pos->side ^=1;
+  
   HASH_SIDE;
+  printf("after hash_side current ***** poskey %llx\n",pos->poskey);
 
   if(MFLAGEP & move)
   {
@@ -326,9 +339,12 @@ void takemove(S_BOARD *pos )
       default : ASSERT(FALSE); 
     }
   }
+  printf("line 342 current ***** poskey %llx\n",pos->poskey);
   movepiece(to,from,pos);
   if(pieceking[pos->pieces[from]])
     pos->kingsq[pos->side] = from;
+  
+  printf("line 347 current ***** poskey %llx\n",pos->poskey);
 
   int captured = CAPTURED(move);
   if (captured != EMPTY)
@@ -343,6 +359,7 @@ void takemove(S_BOARD *pos )
     clearpiece(from,pos);
     addpiece(from,pos,(piececol[PROMOTED(move)] == WHITE ? wp : bp));
   }
+  printf("last checkboard in makemove.c\n current ***** poskey %llx\n",pos->poskey);
   ASSERT(checkboard(pos));
 
 }

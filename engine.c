@@ -29,7 +29,7 @@ int main()
   int movenum =0;
   int move =0;
   printboard(board);
-  printmovelist(list);
+  //printmovelist(list);
   
   for(movenum =0;movenum< list->count; movenum++)
   {
@@ -37,6 +37,7 @@ int main()
     if(!makemove(board,move))
       continue;
     printf("\nMADE:%s\n",prmove(move));
+    printboard(board);
     
     takemove(board);
     printf("\nTAKEN:%s\n",prmove(move));

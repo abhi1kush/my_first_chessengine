@@ -43,11 +43,7 @@ int checkboard(const S_BOARD *pos)
 
   for(t_piece = wp;t_piece <= bk; ++t_piece)
   {
-    if(!(t_pceNum[t_piece]==pos->pceNum[t_piece]))
-    { if(!(t_pceNum[t_piece]==pos->pceNum[t_piece]));
-        printf("\nt_piece %d , t_pceNum[t_piece]: %d  pos->pceNum[t_piece]: %d\n",t_piece,t_pceNum[t_piece],pos->pceNum[t_piece]);
-      ASSERT(t_pceNum[t_piece]==pos->pceNum[t_piece]);
-    }
+    ASSERT(t_pceNum[t_piece]==pos->pceNum[t_piece]);
   }
 
   //check bitboard count
@@ -83,7 +79,7 @@ int checkboard(const S_BOARD *pos)
 
   ASSERT(pos->side == WHITE || pos->side == BLACK);
   //if(!(generateposkey(pos) == pos->poskey))
-    printf("generatekey %llX pos-> poskey %llX  pos->poskey^sidekey %llx generatekey^sidekey %llx\n",generateposkey(pos),pos->poskey,generateposkey(pos)^sidekey,pos->poskey^sidekey);
+  // printf("generatekey %llX pos-> poskey %llX  pos->poskey^sidekey %llx generatekey^sidekey %llx\n",generateposkey(pos),pos->poskey,generateposkey(pos)^sidekey,pos->poskey^sidekey);
   ASSERT(generateposkey(pos) == pos->poskey);
 
   ASSERT(pos->enpass==NO_SQ || (ranksbrd[pos->enpass]==RANK_6 && pos->side == WHITE)
@@ -197,7 +193,7 @@ int parse_fen(char *fen, S_BOARD *pos)
   }
 
   pos->poskey = generateposkey(pos);
-  printf("fen poskey %llx",pos->poskey);
+  //printf("fen poskey %llx",pos->poskey);
   updatelistmaterial(pos);
   return 0;
 }

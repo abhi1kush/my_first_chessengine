@@ -8,7 +8,7 @@ u64 generateposkey(const S_BOARD *pos)
   u64 finalkey =0;
   int piece = EMPTY;
   
-  printf("0 poskey  %llx \n",finalkey);
+  //printf("0 poskey  %llx \n",finalkey);
   
 
   //pieces 
@@ -19,25 +19,25 @@ u64 generateposkey(const S_BOARD *pos)
     {
       ASSERT(piece >= wp && piece <= bk);
       finalkey ^=  piecekeys[piece][sq];
-      printf("1 poskey (^piece %d sq %d) %llx \n",piece,sq,finalkey);
+      //printf("1 poskey (^piece %d sq %d) %llx \n",piece,sq,finalkey);
     }
   }
 
   if(pos->side == WHITE)
   {
     finalkey ^= sidekey;
-    printf("2 poskey (^sidekey) %llx \n",finalkey);
+    //printf("2 poskey (^sidekey) %llx \n",finalkey);
   }
   if(pos->enpass != NO_SQ)
   {
     ASSERT( pos->enpass >= 0 && pos->enpass <SQ_NUM);
     finalkey ^= piecekeys[EMPTY][pos->enpass];
-    printf("3 poskey (^enpass) %llx \n",finalkey);
+    //printf("3 poskey (^enpass) %llx \n",finalkey);
   }
 
   ASSERT( pos->castle >= 0 && pos->castle <= 15);
   finalkey ^= castlekeys[pos->castle];
-  printf("4 poskey (^castle) %llx \n",finalkey);
+  //printf("4 poskey (^castle) %llx \n",finalkey);
 
   return finalkey;
 

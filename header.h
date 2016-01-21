@@ -207,6 +207,6 @@ extern int piecevalidempty(const int pce);
 extern int piecevalid(const int pce);
 
 // perft.c
-extern void perftest(int depth, S_BOARD *pos);
+extern void perfttest(int depth, S_BOARD *pos);
 
 #endif

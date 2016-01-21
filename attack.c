@@ -14,7 +14,7 @@ int sqattacked(const int sq, const int side, const S_BOARD *pos)
 
   ASSERT(sqonboard(sq));
   ASSERT(sidevalid(side));
-  printf("assert checkboard in sqattacked");
+  //printf("assert checkboard in sqattacked");
   ASSERT(checkboard(pos));
 
   //pawns

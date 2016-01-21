@@ -139,7 +139,7 @@ static void addblackpawnmove(const S_BOARD *pos, const int from , const int to, 
 
 void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
 {
-  printf("generate checkboard assert");
+  //printf("generate checkboard assert");
   ASSERT(checkboard(pos));
 
   list->count = 0;
@@ -269,7 +269,7 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
     {
       sq=pos->plist[pce][pceNum];
       ASSERT(sqonboard(sq));
-      printf("Piece : %c on %s\n",pcechar[pce],prsq(sq));
+      //printf("Piece : %c on %s\n",pcechar[pce],prsq(sq));
       
       for(i=0;i<numdir[pce];i++)
       {
@@ -310,7 +310,7 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
     {
       sq=pos->plist[pce][pceNum];
       ASSERT(sqonboard(sq));
-      printf("Piece : %c on %s\n",pcechar[pce],prsq(sq));
+      //printf("Piece : %c on %s\n",pcechar[pce],prsq(sq));
       for(i=0;i<numdir[pce];i++)
       {
         dir = pcedir[pce][i];

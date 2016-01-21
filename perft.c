@@ -8,9 +8,11 @@ long leafnodes;
 void perft(int depth, S_BOARD *pos)
 {
   ASSERT(checkboard(pos));
+  printf("depth %d ",depth);
   if(depth==0)
   {
     leafnodes++;
+    printf(" *check* ");
     return;
   }
 
@@ -20,15 +22,15 @@ void perft(int depth, S_BOARD *pos)
   int movenum =0;
   for( movenum =0; movenum < list->count ; movenum++)
   {
-    if(!makemove(pos,list->moves[movenum].move))
+    if( !makemove(pos,list->moves[movenum].move) )
       continue;
-    perft(depth-1,pos);
+    perft(depth - 1, pos);
     takemove(pos);
   }
   return ;
 }
 
-void perftest(int depth, S_BOARD *pos)
+void perfttest(int depth, S_BOARD *pos)
 {
   ASSERT(checkboard(pos));
   printboard(pos);
@@ -49,7 +51,7 @@ void perftest(int depth, S_BOARD *pos)
     perft(depth -1, pos);
     takemove(pos);
     long oldnodes = leafnodes - cumnodes;
-    printf("move %d : %s : %ld\n",movenum+1,prmove(move),oldnodes);
+    printf("move %d : %s : %ld - %ld = %ld\n",movenum+1,prmove(move),leafnodes,cumnodes,oldnodes);
 
   }
   printf("\n Test Complete : %ld nodes visited \n",leafnodes);

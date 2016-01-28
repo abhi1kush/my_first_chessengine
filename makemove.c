@@ -282,6 +282,7 @@ if(pieceking[pos->pieces[to]])
 if(sqattacked(pos->kingsq[side],pos->side,pos))
 { 
   //king in check still after move
+  //printf("king is still in check");
   takemove(pos);
   return FALSE;
 }

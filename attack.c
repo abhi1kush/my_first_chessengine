@@ -25,7 +25,7 @@ int sqattacked(const int sq, const int side, const S_BOARD *pos)
   }
   else
   {
-    if(pos->pieces[sq-11]==bp || pos->pieces[sq-9] == bp)
+    if(pos->pieces[sq+11]==bp || pos->pieces[sq+9] == bp)
       return TRUE;
 
   }
@@ -34,7 +34,7 @@ int sqattacked(const int sq, const int side, const S_BOARD *pos)
   for(i=0;i < 8;i++)
   {
     pce=pos->pieces[sq+kndir[i]];
-    if(iskn(pce) && piececol[pce] == side)
+    if(pce != OFFBOARD && iskn(pce) && piececol[pce] == side)
       return TRUE;
   }
   
@@ -80,7 +80,7 @@ int sqattacked(const int sq, const int side, const S_BOARD *pos)
   for(i=0;i<8;++i)
   {
     pce=pos->pieces[sq + kidir[i]];
-    if(iski(pce) && piececol[pce] == side)
+    if(pce != OFFBOARD && iski(pce) && piececol[pce] == side)
       return TRUE;
   }
 

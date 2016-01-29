@@ -242,7 +242,7 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
     }
     if(pos->castle & BO_O_O)
     {
-      if(pos->pieces[D1]==EMPTY && pos->pieces[C1] == EMPTY)
+      if(pos->pieces[D8]==EMPTY && pos->pieces[C8] == EMPTY)
         if(!sqattacked(E8,WHITE,pos) && !sqattacked(D8,WHITE,pos) && !sqattacked(C8,WHITE,pos))
         {
           //printf("BO_O_O MoveGen\n");

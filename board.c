@@ -24,6 +24,12 @@ int checkboard(const S_BOARD *pos)
     for(t_pce_num=0;t_pce_num< pos->pceNum[t_piece];t_pce_num++)
     {
       sq120=pos->plist[t_piece][t_pce_num];
+      if(!(pos->pieces[sq120]==t_piece))
+      {
+        printf("pos->pieces[sq120] :%d t_piece :%d",pos->pieces[sq120],t_piece);
+        printboard(pos);
+      }
+
       ASSERT(pos->pieces[sq120]==t_piece);
     }
   //check piece count and other counters 

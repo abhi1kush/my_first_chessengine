@@ -17,34 +17,12 @@
 
 int main()
 { 
-  FILE * fp;
-       char * line = NULL;
-       size_t len = 0;
-       ssize_t read;
-  
-Allinit();
+
+  Allinit();
   
   S_BOARD board[1];
   S_MOVELIST list[1];
-
-
-       fp = fopen("fens", "r");
-       if (fp == NULL)
-           exit(EXIT_FAILURE);
-
-       while ((read = getline(&line, &len, fp)) != -1) {
-           printf("Retrieved line of length %zu :\n", read);
-           parse_fen(line,board);
-           perfttest(5,board);
-       }
-
-       fclose(fp);
-       if (line)
-           free(line);
-       exit(EXIT_SUCCESS)
-
-
- 
+  perfttest(5,board);
   return 0;
 }
 

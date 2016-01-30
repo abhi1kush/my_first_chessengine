@@ -3,7 +3,7 @@
 #define DEFS_H
 #include "stdlib.h"
 
-//#define DEBUG
+#define DEBUG
 
 #ifndef DEBUG
 #define ASSERT(n)
@@ -61,6 +61,16 @@ typedef struct {
 }S_MOVELIST;
 
 typedef struct {
+  u64 poskey;
+  int move;
+}S_PVENTRY;
+
+typedef struct {
+  S_PVENTRY *ptable;
+  int numentries;
+}S_PVTABLE;
+
+typedef struct {
   int move;
   int castle;
   int enpass;
@@ -94,6 +104,8 @@ typedef struct {
    // plist[wn][0]=E1;
    // plist[wn][1]=D4; .. .. ..
 
+   S_PVTABLE pvtable[1];
+
 }S_BOARD;
 
 /*GAME MOVE*/
@@ -118,6 +130,9 @@ typedef struct {
 #define MFLAGCAP 0x7C000
 #define MFLAGPROM 0xF00000
 #define MFLAGCAP 0x7C000 
+
+#define NOMOVE 0
+
 /* macros */
 
 #define FR2SQ(f,r) ((21 +(f))+((r)*10))
@@ -191,7 +206,8 @@ extern int sqattacked(const int sq, const side, const S_BOARD *pos);
 //io.c
 extern char * prmove(const int move);
 extern char * prsq(const int sq);
-
+extern void printmovelist(const S_MOVELIST *list);
+extern int parseove(char * ch,S_BOARD *p);
 //movegen.c
 extern void generateallmoves(const S_BOARD *pos,S_MOVELIST *list);
 
@@ -208,5 +224,14 @@ extern int piecevalid(const int pce);
 
 // perft.c
 extern void perfttest(int depth, S_BOARD *pos);
+
+//search.c
+int isrepetition(const S_BOARD *pos);
+
+//misc.c
+int gettime();
+
+//pvtable.c
+extern void initpvtable(S_PVTABLE *table);
 
 #endif

@@ -1,0 +1,50 @@
+alpha beta prunning
+
+int AB(int depth, int alpha,int beta)
+{
+  MoveScore = -INF;
+  depth < 1 ? return ScoreFromSidePOV();
+
+  for(each node in position)
+  {
+    MakeMove;
+    moveScore = -AB(depth-1,-beta,-alpha);
+    takemove;
+    if(moveScore >= beta )
+      return beta;
+    if(moveScore > alpha)
+      alpha = moveScore;
+  }
+  return alpha;
+}
+
+////////////////////////////////////////////////
+
+int search(depth)
+{
+  int currDepth = 1;
+  iterativeDeepen(depth)
+  {
+    alphabeta();
+    currDepth++;
+  }
+}
+
+int alphabeta()
+{
+  IsRepeated() return 0;
+  IsInterrtupt() { SetQuit(); return 0; }
+
+  GenMoves();
+  probeMove(); -> Need Hash Table
+  if(have PvMove) OrderPvMove();
+  
+  LoopMoves()
+  {
+    Make();
+    alphabeta(depth -1);
+    Take();
+
+    isBetaCut() -> return beta;
+    isAlphacut() { note bestMove , increase alpha};
+  }

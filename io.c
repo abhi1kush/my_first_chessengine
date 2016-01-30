@@ -59,3 +59,50 @@ void printmovelist(const S_MOVELIST *list)
   }
   printf("MoveList Total %d Moves:\n\n",list->count);
 }
+
+
+
+int parsemove(char *ptrchar, S_BOARD *pos)
+{
+  if(ptrchar[1] > '8' || ptrchar[1] < '1') return NOMOVE;
+  if(ptrchar[3] > '8' || ptrchar[3] < '1') return NOMOVE;
+  if(ptrchar[0] > 'h' || ptrchar[0] < 'a') return NOMOVE;
+  if(ptrchar[2] > 'h' || ptrchar[2] < 'a') return NOMOVE;
+
+  int from = FR2SQ(ptrchar[0]-'a',ptrchar[1]-'1');
+  int to = FR2SQ(ptrchar[2]-'a',ptrchar[3]-'1');
+  
+  //printf("ptrchar:%s from :%d to:%d \n",ptrchar,from,to);
+  
+  ASSERT(sqonboard(from)&& sqonboard(to));
+  S_MOVELIST list[1];
+  
+  generateallmoves(pos,list);
+  int movenum =0;
+  int move =0;
+  int prompce = EMPTY;
+
+  for(movenum =0; movenum < list->count; movenum++)
+  {
+    move = list->moves[movenum].move;
+    if(FROMSQ(move)==from && TOSQ(move)==to)
+    {
+      prompce = PROMOTED(move);
+      if(prompce != EMPTY)
+      {
+        if(isrq(prompce) && !isbq(prompce) && ptrchar[4]=='r')
+          return move;
+        else if(!isrq(prompce) && isbq(prompce) && ptrchar[4]=='b')
+          return move;
+        else if(isrq(prompce) && isbq(prompce) && ptrchar[4]=='q')
+          return move;
+        else if(iskn(prompce) && ptrchar[4]=='n')
+          return move;
+        continue;
+      }
+      return move;
+    }
+   }
+   return NOMOVE;
+}
+

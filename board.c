@@ -240,6 +240,8 @@ void resetboard(S_BOARD *pos)
   pos->castle = 0;
   pos->poskey = 0ULL;
 
+  initpvtable(pos->pvtable);
+
 }
 
 void printboard(const S_BOARD *pos)

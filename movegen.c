@@ -97,13 +97,13 @@ static void addwhitepawnmove(const S_BOARD *pos, const int from , const int to, 
   ASSERT(sqonboard(to));
   if(ranksbrd[from]==RANK_7)
   {
-    addcapturemove(pos,MOVE(from,to,EMPTY,wq,0),list);
-    addcapturemove(pos,MOVE(from,to,EMPTY,wr,0),list);
-    addcapturemove(pos,MOVE(from,to,EMPTY,wb,0),list);
-    addcapturemove(pos,MOVE(from,to,EMPTY,wn,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,wq,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,wr,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,wb,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,wn,0),list);
   }
   else
-    addcapturemove(pos,MOVE(from,to,EMPTY,EMPTY,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,EMPTY,0),list);
 }
 
 static void addblackpawncapmove(const S_BOARD *pos, const int from , const int to, const int cap, S_MOVELIST * list)
@@ -128,13 +128,13 @@ static void addblackpawnmove(const S_BOARD *pos, const int from , const int to, 
   ASSERT(sqonboard(to));
   if(ranksbrd[from]==RANK_2)
   {
-    addcapturemove(pos,MOVE(from,to,EMPTY,bq,0),list);
-    addcapturemove(pos,MOVE(from,to,EMPTY,br,0),list);
-    addcapturemove(pos,MOVE(from,to,EMPTY,bb,0),list);
-    addcapturemove(pos,MOVE(from,to,EMPTY,bn,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,bq,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,br,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,bb,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,bn,0),list);
   }
   else
-    addcapturemove(pos,MOVE(from,to,EMPTY,EMPTY,0),list);
+    addquietmove(pos,MOVE(from,to,EMPTY,EMPTY,0),list);
 }
 
 void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
@@ -191,7 +191,7 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
     }
     if(pos->castle & WO_O_O)
     {
-      if(pos->pieces[D1]==EMPTY && pos->pieces[C1] == EMPTY)
+      if(pos->pieces[D1]==EMPTY && pos->pieces[C1] == EMPTY && pos->pieces[B1]==EMPTY)
         if(!sqattacked(E1,BLACK,pos) && !sqattacked(D1,BLACK,pos) && !sqattacked(C1,BLACK,pos))
         {
           //printf("WO_O_O MoveGen\n");
@@ -242,7 +242,7 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
     }
     if(pos->castle & BO_O_O)
     {
-      if(pos->pieces[D8]==EMPTY && pos->pieces[C8] == EMPTY)
+      if(pos->pieces[D8]==EMPTY && pos->pieces[C8] == EMPTY && pos->pieces[B8]==EMPTY)
         if(!sqattacked(E8,WHITE,pos) && !sqattacked(D8,WHITE,pos) && !sqattacked(C8,WHITE,pos))
         {
           //printf("BO_O_O MoveGen\n");

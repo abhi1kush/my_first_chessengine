@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 
-#define FEN6 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+#define FEN6 "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 /*#define BLACKPAWN "rnbqkbnr/p1p1p3/3p3p/1p1p4/2P1Pp2/8/PP1P1PpP/RNBQKB1R b - e3 0 1"
 #define knig "5k2/1n6/4n3/6N1/8/3N4/8/5K2 b - - 0 1"
 #define ROOKS "6k1/8/5r2/8/1nR5/5N2/8/6K1 w - - 0 1"

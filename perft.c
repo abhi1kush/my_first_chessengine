@@ -1,6 +1,7 @@
 //perft.c
 
 #include "stdio.h"
+#include <string.h>
 #include "header.h"
 
 long leafnodes;
@@ -35,7 +36,7 @@ void perft(int depth, S_BOARD *pos)
 
 void perfttest(int depth, S_BOARD *pos)
 {
-  int d;
+  int d=6;
   char * line = NULL;
   size_t len = 0;
   ssize_t read;
@@ -58,10 +59,11 @@ void perfttest(int depth, S_BOARD *pos)
   
   while ((read = getline(&line, &len, fp)) != -1) 
   {
+      line[strlen(line)-1]='\0';
       fprintf(fptr,"%s;",line);
       //printf("%s;",line);
       parse_fen(line,pos);
-      for(d=1;d<=depth;d++)
+      //for(d=1;d<=depth;d++)
       {
         ASSERT(checkboard(pos));
         //printboard(pos);

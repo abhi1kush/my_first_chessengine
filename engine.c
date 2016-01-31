@@ -20,6 +20,8 @@ int main()
 
   char input[6];
   int move = NOMOVE;
+  int pvnum = 0;
+  int max = 0;
   while(TRUE)
   {
     printboard(board);
@@ -31,12 +33,22 @@ int main()
     else if(input[0]=='t')
       takemove(board);
     else if(input[0]=='p')
-      perfttest(4,board);
+    {//perfttest(4,board);
+       max = getpvline(4, board);
+       printf("pvline of %d moves ",max);
+       for(pvnum =0;pvnum<max;pvnum++)
+       {
+         move=board->pvarray[pvnum];
+         printf("%s ",prmove(move));
+       }
+       printf("\n");
+    }
     else
     {
       move = parsemove(input,board);
       if(move != NOMOVE)
-      {
+      { 
+        storepvmove(board,move);
         makemove(board,move);
         /*if(isrepetition(board))
           printf("Repetition occured");*/

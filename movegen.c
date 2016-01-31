@@ -337,3 +337,21 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
 
 }
 
+int moveexists(S_BOARD *pos,const int move)
+{
+  S_MOVELIST list[1];
+  generateallmoves(pos,list);
+
+  int movenum = 0;
+  for(movenum = 0; movenum < list->count; movenum++)
+  {
+    if(!makemove(pos,list->moves[movenum].move))
+      continue;
+    takemove(pos);
+    if(list->moves[movenum].move == move)
+      return TRUE; 
+  }
+  return FALSE;
+
+}
+

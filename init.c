@@ -114,5 +114,6 @@ void Allinit()
   initbitmasks();
   inithashkeys();
   initfilesranksbrd();
+  InitMvvLva();
 }
 

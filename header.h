@@ -3,7 +3,7 @@
 #define DEFS_H
 #include "stdlib.h"
 
-#define DEBUG
+//#define DEBUG
 
 #ifndef DEBUG
 #define ASSERT(n)
@@ -128,7 +128,7 @@ typedef struct {
   int quit;
   int stopped;
 
-  float quit;
+  float fh;
   float fhf;
 
 }S_SEARCHINFO;
@@ -154,7 +154,6 @@ typedef struct {
 
 #define MFLAGCAP 0x7C000
 #define MFLAGPROM 0xF00000
-#define MFLAGCAP 0x7C000 
 
 #define NOMOVE 0
 
@@ -208,7 +207,7 @@ extern int piecebishopqueen[13];
 
 //init.c
 extern void Allinit();
-extern void inithashkeys();
+//extern void inithashkeys();
 
 //bitboard.c
 extern void printbitboard(u64 bitb);
@@ -232,11 +231,12 @@ extern int sqattacked(const int sq, const side, const S_BOARD *pos);
 extern char * prmove(const int move);
 extern char * prsq(const int sq);
 extern void printmovelist(const S_MOVELIST *list);
-extern int parseove(char * ch,S_BOARD *p);
+extern int parsemove(char * ch,S_BOARD *p);
 //movegen.c
 extern void generateallmoves(const S_BOARD *pos,S_MOVELIST *list);
-extern int moveexist(S_BOARD *pos,const int move);
-
+extern int moveexists(S_BOARD *pos,const int move);
+extern int InitMvvLva();
+extern void generateallcaps(const S_BOARD* ,S_MOVELIST *);
 //makemove.c
 extern int makemove(S_BOARD *pos,int move);
 extern void takemove(S_BOARD *pos);
@@ -244,7 +244,7 @@ extern void takemove(S_BOARD *pos);
 //validate.c
 extern int sqonboard(const int sq);
 extern int sidevalid(const int side);
-extern int filrankvalid(const int fr);
+extern int filerankvalid(const int fr);
 extern int piecevalidempty(const int pce);
 extern int piecevalid(const int pce);
 
@@ -252,7 +252,7 @@ extern int piecevalid(const int pce);
 extern void perfttest(int depth, S_BOARD *pos);
 
 //search.c
-//extern static int isrepetition(const S_BOARD *pos);
+extern void searchposition(S_BOARD *,S_SEARCHINFO *);
 
 //misc.c
 extern int gettime();
@@ -261,6 +261,8 @@ extern int gettime();
 extern void initpvtable(S_PVTABLE *table);
 extern void storepvmove(const S_BOARD *pos,const int move);
 extern int probepvtable(const S_BOARD *pos);
+extern int getpvline(const int depth, S_BOARD *pos);
+extern void clearpvtable(S_PVTABLE *t);
 
 //evaluate.c
 extern int evalposition(const S_BOARD *pos);

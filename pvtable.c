@@ -50,7 +50,6 @@ void initpvtable(S_PVTABLE *table)
 {
   table->numentries = pvsize/sizeof(S_PVENTRY);
   table->numentries -= 2;
-  //if(table->ptable != NULL) {free(table->ptable);}
   table->ptable = (S_PVENTRY *)malloc(table->numentries*sizeof(S_PVENTRY));
   clearpvtable(table);
   printf("pvTable init complete with %d entries \n",table->numentries);

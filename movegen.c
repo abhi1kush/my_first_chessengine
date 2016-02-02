@@ -51,26 +51,90 @@ const int pcedir[13][8] = {
 };
 
 const int numdir[13] = {0,0,8,4,4,8,8,0,8,4,4,8,8};
+/*
+ * pv move
+ * cap -> MvvLVA (SEE)
+ * Killers (beta cutoff)
+ * HistoryScore (inc alpha)
+ *
+ * [vic][att]
+ *  p x Q
+ *  N x Q
+ *  B x Q
+ *  R x Q
+ *  ...
+ *  p x R
+ *  N x R
+ *  
+ *  B
+ *
+ *  N
+ *
+ *  p
+ *
+ *  vic Q -> 500 p(505) N(504) ...
+ *  vic R -> 400 p(405) N(404) ...
+ */
+
+const int victimscore[13] = {0,100,200,300,400,500,600,100,200,300,400,500,600};
+static int MvvLvaScores[13][13];
+
+int InitMvvLva()
+{
+  int attacker;
+  int victim;
+  for(attacker = wp; attacker <= bk; attacker++)
+    for(victim = wp;victim <= bk; victim++)
+      MvvLvaScores[victim][attacker] = victimscore[victim] + 6 - (victimscore[attacker]/100);
+  
+ /* for(victim = wp;victim <= bk; victim++)
+    for(attacker = wp; attacker <= bk; attacker++)
+      printf("%c x %c = %d\n",pcechar[attacker],pcechar[victim],MvvLvaScores[victim][attacker]);
+  */
+  return 0;
+}
 
 
 static void addquietmove(const S_BOARD *pos,int move, S_MOVELIST *list)
 {
+  ASSERT(sqonboard(FROMSQ(move)));
+  ASSERT(sqonboard(TOSQ(move)));
+
   list->moves[list->count].move = move;
-  list->moves[list->count].score = 0;
+  
+ if(pos->searchkillers[0][pos->ply]==move)
+ {
+  list->moves[list->count].score = 900000; 
+ }
+ else if(pos->searchkillers[1][pos->ply] == move)
+ {
+  list->moves[list->count].score = 800000; 
+ }
+ else
+ {
+  list->moves[list->count].score = pos->searchhistory[pos->pieces[FROMSQ(move)]][TOSQ(move)]; 
+ }
   list->count++;
 }
 
 static void addcapturemove(const S_BOARD *pos,int move, S_MOVELIST *list)
 {
+  ASSERT(sqonboard(FROMSQ(move)));
+  ASSERT(sqonboard(TOSQ(move)));
+  ASSERT(piecevalid(CAPTURED(move)));
+  
   list->moves[list->count].move = move;
-  list->moves[list->count].score = 0;
+  list->moves[list->count].score = MvvLvaScores[CAPTURED(move)][pos->pieces[FROMSQ(move)]]+1000000;
   list->count++;
 }
 
-static void addenpassntmove(const S_BOARD *pos,int move, S_MOVELIST *list)
+static void addenpassantmove(const S_BOARD *pos,int move, S_MOVELIST *list)
 {
+  ASSERT(sqonboard(FROMSQ(move)));
+  ASSERT(sqonboard(TOSQ(move)));
+  
   list->moves[list->count].move = move;
-  list->moves[list->count].score = 0;
+  list->moves[list->count].score = 105+1000000;
   list->count++;
 }
 
@@ -173,9 +237,9 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
         addwhitepawncapmove(pos,sq,sq+11,pos->pieces[sq+11],list);
       //enpassnt
       if(sq+9==pos->enpass)
-        addcapturemove(pos,MOVE(sq,sq+9,EMPTY,EMPTY,MFLAGEP),list);
+        addenpassantmove(pos,MOVE(sq,sq+9,EMPTY,EMPTY,MFLAGEP),list);
       if(sq+11==pos->enpass)
-        addcapturemove(pos,MOVE(sq,sq+11,EMPTY,EMPTY,MFLAGEP),list);
+        addenpassantmove(pos,MOVE(sq,sq+11,EMPTY,EMPTY,MFLAGEP),list);
     } //for ended
 
     /* castle move */
@@ -224,9 +288,9 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
 
       //enpassnt
       if(sq-9==pos->enpass)
-        addcapturemove(pos,MOVE(sq,sq-9,EMPTY,EMPTY,MFLAGEP),list);
+        addenpassantmove(pos,MOVE(sq,sq-9,EMPTY,EMPTY,MFLAGEP),list);
       if(sq-11==pos->enpass)
-        addcapturemove(pos,MOVE(sq,sq-11,EMPTY,EMPTY,MFLAGEP),list);
+        addenpassantmove(pos,MOVE(sq,sq-11,EMPTY,EMPTY,MFLAGEP),list);
     }
     
     /* castle move */
@@ -355,3 +419,138 @@ int moveexists(S_BOARD *pos,const int move)
 
 }
 
+void generateallcaps(const S_BOARD *pos, S_MOVELIST *list)
+{
+  //printf("generate checkboard assert");
+  ASSERT(checkboard(pos));
+
+  list->count = 0;
+
+  int pce = EMPTY;
+  int side = pos->side;
+  int sq = 0; int t_sq =0;
+  int pceNum = 0;
+  int dir =0;
+  int i =0;
+  int pceindex =0;
+
+  //printf("\n\n Side: %d\n",side);
+
+  if(side == WHITE)
+  {
+    for(pceNum =0; pceNum < pos->pceNum[wp];pceNum++)
+    {
+      sq = pos->plist[wp][pceNum];
+      ASSERT(sqonboard(sq));
+
+      if(!SQOFFBOARD(sq+9) && piececol[pos->pieces[sq+9]]==BLACK)
+        addwhitepawncapmove(pos,sq,sq+9,pos->pieces[sq+9],list);
+      if(!SQOFFBOARD(sq+11) && piececol[pos->pieces[sq+11]]==BLACK)
+        addwhitepawncapmove(pos,sq,sq+11,pos->pieces[sq+11],list);
+      //enpassnt
+      if(sq+9==pos->enpass)
+        addenpassantmove(pos,MOVE(sq,sq+9,EMPTY,EMPTY,MFLAGEP),list);
+      if(sq+11==pos->enpass)
+        addenpassantmove(pos,MOVE(sq,sq+11,EMPTY,EMPTY,MFLAGEP),list);
+    } //for ended
+
+
+  }
+  else
+  {
+    for(pceNum =0; pceNum < pos->pceNum[bp];pceNum++)
+    {
+      sq = pos->plist[bp][pceNum];
+      ASSERT(sqonboard(sq));
+
+      if(!SQOFFBOARD(sq-9) && piececol[pos->pieces[sq-9]]==WHITE)
+        addblackpawncapmove(pos,sq,sq-9,pos->pieces[sq-9],list);
+      if(!SQOFFBOARD(sq-11) && piececol[pos->pieces[sq-11]]==WHITE)
+        addblackpawncapmove(pos,sq,sq-11,pos->pieces[sq-11],list);
+
+      //enpassnt
+      if(sq-9==pos->enpass)
+        addenpassantmove(pos,MOVE(sq,sq-9,EMPTY,EMPTY,MFLAGEP),list);
+      if(sq-11==pos->enpass)
+        addenpassantmove(pos,MOVE(sq,sq-11,EMPTY,EMPTY,MFLAGEP),list);
+    }
+  }
+
+  /* Loop for slide pieces */  
+  
+  pceindex = loopslideindex[side];
+  pce = loopslidepce[pceindex++];
+  
+  while(pce != 0)
+  {
+    ASSERT(piecevalid(pce));
+    //printf("slider pceindex:%d pce : %d\n",pceindex,pce);
+    
+    for(pceNum =0; pceNum < pos->pceNum[pce];pceNum++)
+    {
+      sq=pos->plist[pce][pceNum];
+      ASSERT(sqonboard(sq));
+      //printf("Piece : %c on %s\n",pcechar[pce],prsq(sq));
+      
+      for(i=0;i<numdir[pce];i++)
+      {
+        dir = pcedir[pce][i];
+        t_sq = sq +dir;
+        
+        while(!SQOFFBOARD(t_sq))
+        {
+          if(pos->pieces[t_sq] != EMPTY)
+          {
+            if(piececol[pos->pieces[t_sq]]== side^1)
+            {//printf("\t\tCapture on %s \n", prsq(t_sq));
+             addcapturemove(pos,MOVE(sq,t_sq,pos->pieces[t_sq],EMPTY,0),list);
+            }
+            break;
+          }
+          t_sq += dir;
+        }
+      }
+    }
+    pce = loopslidepce[pceindex++];
+  }
+  /* Loop for slide pieces */
+  
+  /* Loop for non slide pieces */
+  
+  pceindex = loopnonslideindex[side];
+  pce = loopnonslidepce[pceindex++];
+  
+  while(pce != 0)
+  {
+    ASSERT(piecevalid(pce));
+    //printf("non slider pceindex:%d pce : %d\n",pceindex,pce);
+    
+    for(pceNum =0; pceNum <pos->pceNum[pce];pceNum++)
+    {
+      sq=pos->plist[pce][pceNum];
+      ASSERT(sqonboard(sq));
+      //printf("Piece : %c on %s\n",pcechar[pce],prsq(sq));
+      for(i=0;i<numdir[pce];i++)
+      {
+        dir = pcedir[pce][i];
+        t_sq = sq +dir;
+
+        if(SQOFFBOARD(t_sq))
+          continue;
+        // BLACK ^ 1 == WHITE      WHITE ^ 1 == BLACK
+        if(pos->pieces[t_sq] != EMPTY)
+        {
+          if(piececol[pos->pieces[t_sq]] == side ^ 1)
+          {//printf("\t\tCapture on %s\n",prsq(t_sq));
+            addcapturemove(pos,MOVE(sq,t_sq,pos->pieces[t_sq],EMPTY,0),list);}
+          continue;
+        }
+        //printf("\t\tNormal on %s \n",prsq(t_sq));
+      }
+    }
+    pce = loopnonslidepce[pceindex++];
+  }
+
+  /* Loop for non slide pieces */
+
+}

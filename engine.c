@@ -4,8 +4,8 @@
 #include <stdlib.h>
 
 
-#define FEN6 "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N w - - 0 1"
-
+#define FEN6 "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1"
+#define MATE "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - -"
 
 int main()
 { 
@@ -13,9 +13,10 @@ int main()
   Allinit();
   
   S_BOARD board[1];
+  initpvtable(board->pvtable);
   S_MOVELIST list[1];
-  
-  parse_fen(START_FEN,board);
+  S_SEARCHINFO info[1];
+  parse_fen(FEN6,board);
   //perfttest(5,board);
 
   char input[6];
@@ -32,16 +33,10 @@ int main()
       break;
     else if(input[0]=='t')
       takemove(board);
-    else if(input[0]=='p')
-    {//perfttest(4,board);
-       max = getpvline(4, board);
-       printf("pvline of %d moves ",max);
-       for(pvnum =0;pvnum<max;pvnum++)
-       {
-         move=board->pvarray[pvnum];
-         printf("%s ",prmove(move));
-       }
-       printf("\n");
+    else if(input[0]=='s')
+    {
+      info->depth=6;
+      searchposition(board,info);
     }
     else
     {
@@ -58,7 +53,7 @@ int main()
     }
     fflush(stdin);
   }
-  
+  free(board->pvtable->ptable);
   return 0;
 }
 

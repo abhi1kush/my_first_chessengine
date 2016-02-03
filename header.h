@@ -21,7 +21,7 @@
 
 typedef unsigned long long u64;
 
-#define NAME "engine 1.0"
+#define NAME "abhi_engine 1.0"
 #define SQ_NUM 120
 #define MAXMOVES 2048
 #define MAXPOSITIONMOVES 256
@@ -115,8 +115,8 @@ typedef struct {
 
 typedef struct {
 
-  int starttime;
-  int stoptime;
+  unsigned long starttime;
+  unsigned long stoptime;
   int depth;
   int depthset;
   int timeset;
@@ -256,6 +256,7 @@ extern void searchposition(S_BOARD *,S_SEARCHINFO *);
 
 //misc.c
 extern int gettime();
+extern void readinput(S_SEARCHINFO *info);
 
 //pvtable.c
 extern void initpvtable(S_PVTABLE *table);

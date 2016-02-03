@@ -6,6 +6,15 @@
 #define INFINITE 30000
 #define MATE 29000
 
+static void checkup(S_SEARCHINFO *info)
+{
+  //check if time up, or interrupt from GUI
+  if(info->timeset == TRUE && gettime() > info->stoptime)
+    info->stopped = TRUE;
+  
+  ReadInput(info);
+}
+
 static void picknextmove(int movenum, S_MOVELIST *list)
 {
   S_MOVE temp;
@@ -37,12 +46,6 @@ static int isrepetition(const S_BOARD *pos)
  return FALSE;
 }
 
-static void checkup(S_SEARCHINFO *info)
-{
-  //check if time up, or interrupt from GUI
-  if(info->timeset == TRUE && gettime() > info->stoptime)
-    info->stopped = TRUE;
-}
 
 static int quiescence(int alpha, int beta, S_BOARD *pos,S_SEARCHINFO *info)
 {
@@ -135,7 +138,7 @@ static void clearforsearch(S_BOARD *pos, S_SEARCHINFO *info)
   clearpvtable(pos->pvtable);
   pos->ply=0;
 
-  info->starttime = gettime();
+  //info->starttime = gettime();
   info->stopped=0;
   info->nodes=0;
   info->fh =0;
@@ -272,13 +275,13 @@ void searchposition(S_BOARD *pos, S_SEARCHINFO *info)
     pvmoves = getpvline(currentdepth,pos);
     bestmove = pos->pvarray[0]; 
 
-    printf("info score cp %d depth %d nodes %ld time %d ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
+    printf("info score cp %d depth %d nodes %ld time %ld ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
     pvmoves = getpvline(currentdepth,pos);
     printf("pv");
     for(pvnum=0;pvnum < pvmoves;pvnum++)
       printf(" %s \n",prmove(pos->pvarray[pvnum]));
     printf("\n");
-    printf("Ordering:%2f\n",(info->fhf/info->fh));
+    //printf("Ordering:%2f\n",(info->fhf/info->fh));
   }
   //info score cp 13 depth 1 nodes 13 time 15 pv f1b5
   printf("bestmove %s \n",prmove(bestmove));

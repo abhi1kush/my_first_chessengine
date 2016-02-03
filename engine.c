@@ -11,7 +11,40 @@ int main()
 { 
 
   Allinit();
+
+  uci_loop();
   
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ *
+ *
   S_BOARD board[1];
   initpvtable(board->pvtable);
   S_MOVELIST list[1];
@@ -36,6 +69,9 @@ int main()
     else if(input[0]=='s')
     {
       info->depth=6;
+      info->starttime = gettime();
+      info->stoptime = gettime() + 200000;
+
       searchposition(board,info);
     }
     else
@@ -45,15 +81,12 @@ int main()
       { 
         storepvmove(board,move);
         makemove(board,move);
-        /*if(isrepetition(board))
-          printf("Repetition occured");*/
+        //if(isrepetition(board))
+          //printf("Repetition occured");
       }
       else
         printf("Move not passed: %s\n",input);
     }
     fflush(stdin);
   }
-  free(board->pvtable->ptable);
-  return 0;
-}
-
+  */

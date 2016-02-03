@@ -37,15 +37,22 @@ static int isrepetition(const S_BOARD *pos)
  return FALSE;
 }
 
-static void checkup()
+static void checkup(S_SEARCHINFO *info)
 {
   //check if time up, or interrupt from GUI
+  if(info->timeset == TRUE && gettime() > info->stoptime)
+    info->stopped = TRUE;
 }
 
 static int quiescence(int alpha, int beta, S_BOARD *pos,S_SEARCHINFO *info)
 {
   ASSERT(checkboard(pos));
+
+  if((info->nodes & 2047) == 0 )
+    checkup(info);
+
   info->nodes++;
+  
   if(isrepetition(pos) || pos->fiftymove >= 100)
   {
     return 0;
@@ -81,6 +88,9 @@ static int quiescence(int alpha, int beta, S_BOARD *pos,S_SEARCHINFO *info)
     legal++;
     score = -quiescence(-beta,-alpha,pos,info);
     takemove(pos);
+
+    if(info->stopped == TRUE)
+      return 0;
     
     if(score > alpha)
     {
@@ -143,6 +153,9 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
     //info->nodes++;
     //return evalposition(pos);
   }
+  
+  if((info->nodes & 2047) == 0 )
+    checkup(info);
 
   info->nodes++;
 
@@ -187,6 +200,9 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
     legal++;
     score = -alphabeta(-beta,-alpha,depth - 1,pos,info,TRUE);
     takemove(pos);
+    
+    if(info->stopped == TRUE)
+      return 0;
     
     if(score > alpha)
     {
@@ -250,11 +266,13 @@ void searchposition(S_BOARD *pos, S_SEARCHINFO *info)
     bestscore = alphabeta(-INFINITE,INFINITE,currentdepth,pos,info,TRUE);
     
     // out of time?
-    
+    if(info->stopped == TRUE)
+      break;
+
     pvmoves = getpvline(currentdepth,pos);
     bestmove = pos->pvarray[0]; 
 
-    printf("Depth: %d score: %d move: %s nodes : %ld ",currentdepth,bestscore,prmove(bestmove),info->nodes);
+    printf("info score cp %d depth %d nodes %ld time %d ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
     pvmoves = getpvline(currentdepth,pos);
     printf("pv");
     for(pvnum=0;pvnum < pvmoves;pvnum++)
@@ -262,4 +280,6 @@ void searchposition(S_BOARD *pos, S_SEARCHINFO *info)
     printf("\n");
     printf("Ordering:%2f\n",(info->fhf/info->fh));
   }
+  //info score cp 13 depth 1 nodes 13 time 15 pv f1b5
+  printf("bestmove %s \n",prmove(bestmove));
 }

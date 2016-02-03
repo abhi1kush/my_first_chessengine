@@ -236,9 +236,9 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
       if(!SQOFFBOARD(sq+11) && piececol[pos->pieces[sq+11]]==BLACK)
         addwhitepawncapmove(pos,sq,sq+11,pos->pieces[sq+11],list);
       //enpassnt
-      if(sq+9==pos->enpass)
+      if(!SQOFFBOARD(sq+9) && sq+9==pos->enpass)
         addenpassantmove(pos,MOVE(sq,sq+9,EMPTY,EMPTY,MFLAGEP),list);
-      if(sq+11==pos->enpass)
+      if(!SQOFFBOARD(sq+11) && sq+11==pos->enpass)
         addenpassantmove(pos,MOVE(sq,sq+11,EMPTY,EMPTY,MFLAGEP),list);
     } //for ended
 
@@ -287,9 +287,9 @@ void generateallmoves(const S_BOARD *pos, S_MOVELIST *list)
         addblackpawncapmove(pos,sq,sq-11,pos->pieces[sq-11],list);
 
       //enpassnt
-      if(sq-9==pos->enpass)
+      if(!SQOFFBOARD(sq-9) && sq-9==pos->enpass)
         addenpassantmove(pos,MOVE(sq,sq-9,EMPTY,EMPTY,MFLAGEP),list);
-      if(sq-11==pos->enpass)
+      if(!SQOFFBOARD(sq-11) && sq-11==pos->enpass)
         addenpassantmove(pos,MOVE(sq,sq-11,EMPTY,EMPTY,MFLAGEP),list);
     }
     
@@ -448,9 +448,9 @@ void generateallcaps(const S_BOARD *pos, S_MOVELIST *list)
       if(!SQOFFBOARD(sq+11) && piececol[pos->pieces[sq+11]]==BLACK)
         addwhitepawncapmove(pos,sq,sq+11,pos->pieces[sq+11],list);
       //enpassnt
-      if(sq+9==pos->enpass)
+      if(!SQOFFBOARD(sq+9) && sq+9==pos->enpass)
         addenpassantmove(pos,MOVE(sq,sq+9,EMPTY,EMPTY,MFLAGEP),list);
-      if(sq+11==pos->enpass)
+      if(!SQOFFBOARD(sq+11) && sq+11==pos->enpass)
         addenpassantmove(pos,MOVE(sq,sq+11,EMPTY,EMPTY,MFLAGEP),list);
     } //for ended
 
@@ -469,9 +469,9 @@ void generateallcaps(const S_BOARD *pos, S_MOVELIST *list)
         addblackpawncapmove(pos,sq,sq-11,pos->pieces[sq-11],list);
 
       //enpassnt
-      if(sq-9==pos->enpass)
+      if(!SQOFFBOARD(sq-9) && sq-9==pos->enpass)
         addenpassantmove(pos,MOVE(sq,sq-9,EMPTY,EMPTY,MFLAGEP),list);
-      if(sq-11==pos->enpass)
+      if(!SQOFFBOARD(sq-11) && sq-11==pos->enpass)
         addenpassantmove(pos,MOVE(sq,sq-11,EMPTY,EMPTY,MFLAGEP),list);
     }
   }

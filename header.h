@@ -267,4 +267,7 @@ extern void clearpvtable(S_PVTABLE *t);
 //evaluate.c
 extern int evalposition(const S_BOARD *pos);
 
+//uci.c
+extern void uci_loop(); 
+
 #endif

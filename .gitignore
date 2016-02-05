@@ -1,0 +1,20 @@
+  aout
+    aout.tar.gz
+      d6
+        d6_2
+          evaluate.c~
+            fens~
+              game.000
+                header.h~
+                  in
+                    log.000
+                      makemove.c~
+                        movegen.c~
+                          out
+                            players.dat
+                              tmp1
+                                tmp2
+                                  tmpmg
+                                    xboard.c~
+
+

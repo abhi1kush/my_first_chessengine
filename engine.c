@@ -11,8 +11,12 @@ int main()
 { 
 
   Allinit();
+  S_BOARD pos[1];
+  S_SEARCHINFO info[1];
+  initpvtable(pos->pvtable);
+  uci_loop(pos,info);
 
-  uci_loop();
+  free(pos->pvtable->ptable);
   
   return 0;
 }

@@ -273,16 +273,39 @@ void searchposition(S_BOARD *pos, S_SEARCHINFO *info)
       break;
 
     pvmoves = getpvline(currentdepth,pos);
-    bestmove = pos->pvarray[0]; 
+    bestmove = pos->pvarray[0];
 
-    printf("info score cp %d depth %d nodes %ld time %ld ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
-    pvmoves = getpvline(currentdepth,pos);
-    printf("pv");
-    for(pvnum=0;pvnum < pvmoves;pvnum++)
-      printf(" %s \n",prmove(pos->pvarray[pvnum]));
-    printf("\n");
+    if(info->GAME_MODE == UCIMODE)
+       printf("info score cp %d depth %d nodes %ld time %ld ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
+    else if(info->GAME_MODE == XBOARDMODE && info->POST_THINKING == TRUE)
+      printf("%d %d %d %ld",currentdepth,bestscore,(gettime()-info->starttime)/10,info->nodes);
+    else if(info->POST_THINKING == TRUE)
+       printf("score %d depth %d nodes %ld time %ld ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
+    
+    if(info->GAME_MODE == UCIMODE || info->POST_THINKING == TRUE)
+    {
+      pvmoves = getpvline(currentdepth,pos);
+      printf("pv");
+      for(pvnum=0;pvnum < pvmoves;pvnum++)
+        printf(" %s \n",prmove(pos->pvarray[pvnum]));
+      printf("\n");
     //printf("Ordering:%2f\n",(info->fhf/info->fh));
+    }
+  }
+  
+  if(info->GAME_MODE == UCIMODE)
+    printf("bestmove %s\n",prmove(bestmove));
+  else if(info->GAME_MODE == XBOARDMODE)
+  {
+    printf("move %s\n",prmove(bestmove));
+    makemove(pos,bestmove);
+  }
+  else 
+  {
+    printf("\n\n***!! engine makes move %s !!*** \n\n",prmove(bestmove));
+    makemove(pos,bestmove);
+    printboard(pos);
   }
   //info score cp 13 depth 1 nodes 13 time 15 pv f1b5
-  printf("bestmove %s \n",prmove(bestmove));
+  //printf("bestmove %s \n",prmove(bestmove));
 }

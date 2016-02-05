@@ -32,6 +32,7 @@ typedef unsigned long long u64;
 enum { EMPTY, wp, wn, wb, wr, wq, wk, bp, bn, bb, br, bq, bk };
 enum {FILE_A, FILE_B, FILE_C, FILE_D ,FILE_E ,FILE_F ,FILE_G ,FILE_H, FILE_NONE };
 enum { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NONE };
+enum {UCIMODE, XBOARDMODE, CONSOLEMODE};
 
 enum { WHITE, BLACK, BOTH };
 
@@ -269,6 +270,6 @@ extern void clearpvtable(S_PVTABLE *t);
 extern int evalposition(const S_BOARD *pos);
 
 //uci.c
-extern void uci_loop(); 
+extern void uci_loop(S_BOARD *pos, S_SEARCHINFO *info); 
 
 #endif

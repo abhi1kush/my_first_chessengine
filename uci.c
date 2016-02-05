@@ -110,7 +110,7 @@ void parseposition(char * linein, S_BOARD *pos)
   printboard(pos);
 }
 
-void uci_loop()
+void uci_loop(S_BOARD *pos, S_SEARCHINFO *info)
 {
   setbuf(stdin,NULL);
   setbuf(stdout,NULL);
@@ -158,5 +158,5 @@ void uci_loop()
     }
     if(info->quit) break;
   }
-  free(pos->pvtable->ptable);
+  //free(pos->pvtable->ptable);
 }

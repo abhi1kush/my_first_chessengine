@@ -6,13 +6,12 @@
 
 //position startpos moves e2e4 e7e5 ... .. .. ... ...
 //go wtime ......
-
-usermove e2e4
-move e7e5
+//usermove e2e4
+//move e7e5
 
 int threefoldrep(const S_BOARD *pos)
 {
-  int i=0; r =0;
+  int i=0, r =0;
   for(i=0;i<pos->historyply;i++)
   {
     if(pos->history[i].poskey == pos->poskey)
@@ -92,13 +91,19 @@ int checkresult(S_BOARD *pos)
 }
 
 
+void printoptions() {
+    printf("feature ping=1 setboard=1 colors=0 usermove=1\n");      
+    printf("feature done=1\n");
+}
+
 void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info) 
 {
   info->GAME_MODE = XBOARDMODE;
   info->POST_THINKING = TRUE;
   setbuf(stdin, NULL);
   setbuf(stdout, NULL);
-  PrintOptions(); // HACK
+  printoptions(); // HACK
+
   int depth = -1, movestogo[2] = {30,30 }, movetime = -1;
   int time = -1, inc = 0;                             
   int engineSide = BOTH;                    
@@ -109,7 +114,7 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
   int i, score;
   char inBuf[80], command[80];  
   engineSide = BLACK; 
-  ParseFen(START_FEN, pos);
+  parse_fen(START_FEN, pos);
   depth = -1; 
   time = -1;
 
@@ -118,7 +123,7 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
     fflush(stdout);
     if(pos->side == engineSide && checkresult(pos) == FALSE) 
     {  
-      info->starttime = GetTimeMs();
+      info->starttime = gettime();
       info->depth = depth;
       if(time != -1) 
       {
@@ -131,9 +136,9 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
       {
         info->depth = MAXDEPTH;
       }
-      printf("time:%d start:%d stop:%d depth:%d timeset:%d movestogo:%d mps:%d\n",
+      printf("time:%d start:%ld stop:%ld depth:%d timeset:%d movestogo:%d mps:%d\n",
         time,info->starttime,info->stoptime,info->depth,info->timeset, movestogo[pos->side], mps);
-      SearchPosition(pos, info);
+      searchposition(pos, info);
       if(mps != 0) 
       {
         movestogo[pos->side^1]--;
@@ -162,7 +167,7 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
     } 
 
     if(!strcmp(command, "protover")){
-      PrintOptions();
+      printoptions();
         continue;
     }
 
@@ -216,7 +221,7 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
 
     if(!strcmp(command, "new")) { 
       engineSide = BLACK; 
-      ParseFen(START_FEN, pos);
+      parse_fen(START_FEN, pos);
       depth = -1; 
       time = -1;
       continue; 
@@ -224,7 +229,7 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
 
     if(!strcmp(command, "setboard")){
       engineSide = BOTH;  
-      ParseFen(inBuf+9, pos); 
+      parse_fen(inBuf+9, pos); 
       continue; 
     }       
 
@@ -235,12 +240,143 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
 
     if(!strcmp(command, "usermove")){
       movestogo[pos->side]--;
-      move = ParseMove(inBuf+9, pos); 
+      move = parsemove(inBuf+9, pos); 
       if(move == NOMOVE) continue;
-      MakeMove(pos, move);
+      makemove(pos, move);
             pos->ply=0;
     }    
   } 
 }
 
+
+
+void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
+
+	printf("Welcome to abhi_engine In Console Mode!\n");
+	printf("Type help for commands\n\n");
+
+	info->GAME_MODE = CONSOLEMODE;
+	info->POST_THINKING = TRUE;
+	setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+	
+	int depth = MAXDEPTH, movetime = 3000;            
+	int engineSide = BOTH;    
+	int move = NOMOVE;		
+	char inBuf[80], command[80];	
+	
+	engineSide = BLACK; 
+	parse_fen(START_FEN, pos);	
+	
+	while(TRUE) { 
+
+		fflush(stdout);
+
+		if(pos->side == engineSide && checkresult(pos) == FALSE) {  
+			info->starttime = gettime();
+			info->depth = depth;
+			
+			if(movetime != 0) {
+				info->timeset = TRUE;
+				info->stoptime = info->starttime + movetime;
+			} 	
+			
+			searchposition(pos, info);
+		}	
+		
+		printf("\nabhi_engine > ");
+
+		fflush(stdout); 
+	
+		memset(&inBuf[0], 0, sizeof(inBuf));
+		fflush(stdout);
+		if (!fgets(inBuf, 80, stdin))
+		continue;
+    
+		sscanf(inBuf, "%s", command);
+		
+		if(!strcmp(command, "help")) { 
+			printf("Commands:\n");
+			printf("quit - quit game\n");
+			printf("force - computer will not think\n");
+			printf("print - show board\n");
+			printf("post - show thinking\n");
+			printf("nopost - do not show thinking\n");
+			printf("new - start new game\n");
+			printf("go - set computer thinking\n");
+			printf("depth x - set depth to x\n");
+			printf("time x - set thinking time to x seconds (depth still applies if set)\n");
+			printf("view - show current depth and movetime settings\n");
+			printf("** note ** - to reset time and depth, set to 0\n");
+			printf("enter moves using b7b8q notation\n\n\n");
+			continue;
+		}
+    
+		if(!strcmp(command, "quit")) { 
+			info->quit = TRUE;
+			break; 
+		}
+		
+		if(!strcmp(command, "post")) { 
+			info->POST_THINKING = TRUE;
+			continue; 
+		}
+		
+		if(!strcmp(command, "print")) { 
+			printboard(pos);
+			continue; 
+		}
+		
+		if(!strcmp(command, "nopost")) { 
+			info->POST_THINKING = FALSE;
+			continue; 
+		}
+		
+		if(!strcmp(command, "force")) { 
+			engineSide = BOTH; 
+			continue; 
+		} 
+		
+		if(!strcmp(command, "view")) {
+			if(depth == MAXDEPTH) printf("depth not set ");
+			else printf("depth %d",depth);
+			
+			if(movetime != 0) printf(" movetime %ds\n",movetime/1000);
+			else printf(" movetime not set\n");
+			
+			continue; 
+		}
+		
+		if(!strcmp(command, "depth")) {
+			sscanf(inBuf, "depth %d", &depth); 
+		    if(depth==0) depth = MAXDEPTH;
+			continue; 
+		}
+		
+		if(!strcmp(command, "time")) {
+			sscanf(inBuf, "time %d", &movetime); 
+			movetime *= 1000;
+			continue; 
+		} 
+		
+		if(!strcmp(command, "new")) { 
+			engineSide = BLACK; 
+			parse_fen(START_FEN, pos);
+			continue; 
+		}
+		
+		if(!strcmp(command, "go")) { 
+			engineSide = pos->side;  
+			continue; 
+		}	
+		
+		move = parsemove(inBuf, pos);	
+		if(move == NOMOVE) {
+			printf("Command unknown:%s\n",inBuf);
+			continue;
+		}
+		makemove(pos, move);
+		pos->ply=0;
+    }	
+}
 

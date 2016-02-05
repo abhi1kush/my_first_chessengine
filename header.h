@@ -132,6 +132,9 @@ typedef struct {
   float fh;
   float fhf;
 
+  int GAME_MODE;
+  int POST_THINKING;
+
 }S_SEARCHINFO;
 
 /*GAME MOVE*/
@@ -271,5 +274,9 @@ extern int evalposition(const S_BOARD *pos);
 
 //uci.c
 extern void uci_loop(S_BOARD *pos, S_SEARCHINFO *info); 
+
+//xboard.c
+extern void console_loop(S_BOARD *pos, S_SEARCHINFO *info);
+extern void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info);
 
 #endif

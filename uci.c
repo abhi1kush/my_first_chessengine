@@ -120,8 +120,6 @@ void uci_loop(S_BOARD *pos, S_SEARCHINFO *info)
   printf("id author Bluefever\n");
   printf("uciok\n");
 
-  S_BOARD pos[1];
-  S_SEARCHINFO info[1];
   initpvtable(pos->pvtable);
 
   while(TRUE)

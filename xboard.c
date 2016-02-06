@@ -100,9 +100,11 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
 {
   info->GAME_MODE = XBOARDMODE;
   info->POST_THINKING = TRUE;
+ 
   setbuf(stdin, NULL);
   setbuf(stdout, NULL);
-  printoptions(); // HACK
+  
+  //printoptions(); // HACK
 
   int depth = -1, movestogo[2] = {30,30 }, movetime = -1;
   int time = -1, inc = 0;                             
@@ -376,7 +378,7 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 			continue;
 		}
 		makemove(pos, move);
-		pos->ply=0;
+
     }	
 }
 

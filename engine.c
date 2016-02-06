@@ -18,9 +18,10 @@ int main()
 
   printf("Welcome to abhi_engine! type cons for console mode ...\n");
   char line[256];
+
   while(TRUE)
   {
-    memset(&line[0],0,sizeof(line));
+    memset(line,0,sizeof(line));
     fflush(stdout);
     if(!fgets(line,256,stdin))
       continue;

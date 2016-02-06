@@ -172,6 +172,11 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
      return evalposition(pos);
   }
 
+  int incheck = sqattacked(pos->kingsq[pos->side],pos->side^1,pos); 
+
+  if(incheck == TRUE)
+    depth++;
+
   S_MOVELIST list[1];
   generateallmoves(pos,list);
 
@@ -234,7 +239,7 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
 
   if(legal == 0)
   {
-    if(sqattacked(pos->kingsq[pos->side],pos->side^1,pos))
+    if(incheck)
       return -MATE + pos->ply;
     else
       return 0;

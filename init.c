@@ -21,6 +21,92 @@ u64 castlekeys[16];
 
 int filesbrd[SQ_NUM];
 int ranksbrd[SQ_NUM];
+u64 filebbmask[8];
+u64 rankbbmask[8];
+
+u64 blackpassedmask[64];
+u64 whitepassedmask[64];
+u64 isolatedmask[64];
+
+/*
+ 0 0 0 1 1 1 0 0
+ 0 0 0 1 1 1 0 0
+ 0 0 0 1 1 1 0 0
+ 0 0 0 1 1 1 0 0
+ 0 0 0 1 1 1 0 0
+ 0 0 0 0 x 0 0 0
+ 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0
+ */
+
+void initevalmasks()
+{
+  int sq, tsq, r, f;
+  for(sq=0;sq<8;sq++)
+  {
+    filebbmask[sq] = 0ULL;
+    rankbbmask[sq] = 0ULL;
+  }
+
+  for(r = RANK_8;r >= RANK_1; r--)
+  {
+    for(f = FILE_A;f <= FILE_H; f++)
+    {
+      sq = r*8+f;
+      filebbmask[f] |= (1ULL << sq);
+      rankbbmask[r] |= (1ULL << sq);
+    }
+  }
+  
+  for(sq = 0; sq<64; sq++)
+  {
+    isolatedmask[sq] = 0ULL;
+    whitepassedmask[sq] = 0ULL;
+    blackpassedmask[sq] = 0ULL;
+  }
+  
+  for(sq = 0; sq < 64; sq++)
+  {
+    tsq = sq + 8;
+    while(tsq < 64)
+    {
+      whitepassedmask[sq] |= (1ULL << tsq);
+      tsq+= 8;
+    }
+
+    tsq = sq -8;
+    while(tsq >= 0)
+    {
+      blackpassedmask[sq] != (1ULL << tsq);
+      tsq -= 8;
+    }
+
+    if(filesbrd[SQ120(sq)] > FILE_A)
+    {
+      isolatedmask[sq] |= filebbmask[filesbrd[SQ120(sq)] - 1];
+      tsq = sq + 7;
+      while(tsq < 64)
+      {
+        whitepassedmask[sq] |= (1ULL << tsq);
+        tsq += 8;
+      }
+      
+      tsq = sq - 9;
+      while(tsq >= 0) 
+      {
+        blackpassedmask[sq] |= (1ULL << tsq);
+        tsq -= 8;
+      }
+
+    }
+
+    if(filesbrd[SQ120(sq)] < FILE_H)
+    {
+      isolatedmask[sq] |= filebbmask[filesbrd[SQ120(sq)]]
+
+    }
+
+}
 
 void initfilesranksbrd()
 {
@@ -114,6 +200,7 @@ void Allinit()
   initbitmasks();
   inithashkeys();
   initfilesranksbrd();
+  initevalmasks();
   InitMvvLva();
 }
 

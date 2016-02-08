@@ -275,6 +275,51 @@ void printboard(const S_BOARD *pos)
       
 }
 
+void mirrorboard(S_BOARD *pos)
+{
+  int temppiecearray[64];
+  int tempside = pos->side^1;
+  int swappiece[13] = {EMPTY,bp,bn,bb,br,bq,bk,wp,wn,wb,wr,wq,wk};
+  int tempcastle=0;
+  int tempenpass = NO_SQ;
+  
+  int sq;
+  int tp;
+
+  if(pos->castle & WO_O) tempcastle |= BO_O;
+  if(pos->castle & WO_O_O) tempcastle |= BO_O_O;
+  
+  if(pos->castle & BO_O) tempcastle |= WO_O;
+  if(pos->castle & BO_O_O) tempcastle |= WO_O_O;
+
+  if(pos->enpass != NO_SQ)
+    tempenpass = SQ120(mirror64[SQ64(pos->enpass)]);
+  
+  for(sq=0;sq<64;sq++)
+  {
+    temppiecearray[sq] = pos->pieces[SQ120(mirror64[sq])];
+  }
+
+  resetboard(pos);
+
+  for(sq =0; sq < 64; sq++)
+  {
+    tp = swappiece[temppiecearray[sq]];
+    pos->pieces[SQ120(sq)] = tp;
+  }
+
+  pos->side = tempside;
+  pos->castle = tempcastle;
+  pos->enpass = tempenpass;
+
+  pos->poskey = generateposkey(pos);
+
+  updatelistmaterial(pos);
+
+  ASSERT(checkboard(pos));
+}
+
+
 void updatelistmaterial(S_BOARD *pos)
 {
   int piece,sq,i,color;

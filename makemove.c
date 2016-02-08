@@ -41,6 +41,51 @@ const int castleperm[120] = {
 15,15,15,15,15,15,15,15,15,15
 };
 
+void makenullmove(S_BOARD *pos)
+{
+  ASSERT(checkboard(pos));
+  ASSERT(!INCHECK);
+
+  pos->ply++;
+  pos->history[pos->historyply].poskey = pos->poskey;
+
+  if(pos->enpass != NO_SQ) HASH_EP;
+
+  pos->history[pos->historyply].move = NOMOVE;
+  pos->history[pos->historyply].fiftymove = pos->fiftymove;
+  pos->history[pos->historyply].enpass = pos->enpass;
+  pos->history[pos->historyply].castle = pos->castle;
+  pos->enpass = NO_SQ;
+
+  pos->side ^= 1;
+  pos->historyply++;
+  HASH_SIDE;
+
+  ASSERT(checkboard(pos));
+  return;
+}//MakeNullMove
+
+void takenullmove(S_BOARD *pos)
+{
+  ASSERT(checkboard(pos));
+
+  pos->historyply--;
+  pos->ply--;
+
+  if(pos->enpass != NO_SQ) HASH_EP;
+
+  pos->castle = pos->history[pos->historyply].castle;
+  pos->fiftymove = pos->history[pos->historyply].fiftymove;
+  pos->enpass = pos->history[pos->historyply].enpass;
+
+  if(pos->enpass != NO_SQ) HASH_EP;
+
+  pos->side ^= 1;
+  HASH_SIDE;
+
+  ASSERT(checkboard(pos));
+}
+
 static void clearpiece(const int sq, S_BOARD *pos)
 {
   ASSERT(sqonboard(sq));

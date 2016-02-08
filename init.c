@@ -67,31 +67,31 @@ void initevalmasks()
   
   for(sq = 0; sq < 64; sq++)
   {
-    tsq = sq + 8;
+    tsq = sq + 8; // skipping first rank
     while(tsq < 64)
     {
       whitepassedmask[sq] |= (1ULL << tsq);
       tsq+= 8;
     }
 
-    tsq = sq -8;
+    tsq = sq - 8;
     while(tsq >= 0)
     {
-      blackpassedmask[sq] != (1ULL << tsq);
+      blackpassedmask[sq] |= (1ULL << tsq);
       tsq -= 8;
     }
 
     if(filesbrd[SQ120(sq)] > FILE_A)
     {
       isolatedmask[sq] |= filebbmask[filesbrd[SQ120(sq)] - 1];
-      tsq = sq + 7;
+      tsq = sq + 7; //going right
       while(tsq < 64)
       {
         whitepassedmask[sq] |= (1ULL << tsq);
         tsq += 8;
       }
       
-      tsq = sq - 9;
+      tsq = sq - 9; //going left
       while(tsq >= 0) 
       {
         blackpassedmask[sq] |= (1ULL << tsq);
@@ -102,10 +102,23 @@ void initevalmasks()
 
     if(filesbrd[SQ120(sq)] < FILE_H)
     {
-      isolatedmask[sq] |= filebbmask[filesbrd[SQ120(sq)]]
+      isolatedmask[sq] |= filebbmask[filesbrd[SQ120(sq)]+1];
 
+      tsq = sq + 9; // going left
+      while(tsq < 64)
+      {
+        whitepassedmask[sq] |= (1ULL << tsq);
+        tsq += 8;
+      }
+
+      tsq = sq - 7; //going right
+      while(tsq >= 0)
+      {
+        blackpassedmask[sq] |= (1ULL << tsq);
+        tsq -= 8;
+      }
     }
-
+  }
 }
 
 void initfilesranksbrd()
@@ -194,6 +207,7 @@ void initsq120to64()
     }
 
 }
+
 void Allinit()
 {
   initsq120to64();

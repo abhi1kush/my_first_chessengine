@@ -260,7 +260,7 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 	info->GAME_MODE = CONSOLEMODE;
 	info->POST_THINKING = TRUE;
 	setbuf(stdin, NULL);
-    setbuf(stdout, NULL);
+  setbuf(stdout, NULL);
 	
 	int depth = MAXDEPTH, movetime = 3000;            
 	int engineSide = BOTH;    
@@ -274,15 +274,16 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 
 		fflush(stdout);
 
-		if(pos->side == engineSide && checkresult(pos) == FALSE) {  
+		if(pos->side == engineSide && checkresult(pos) == FALSE) 
+    {  
 			info->starttime = gettime();
 			info->depth = depth;
 			
-			if(movetime != 0) {
+			if(movetime != 0) 
+      {
 				info->timeset = TRUE;
 				info->stoptime = info->starttime + movetime;
 			} 	
-			
 			searchposition(pos, info);
 		}	
 		
@@ -292,9 +293,9 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 	
 		memset(&inBuf[0], 0, sizeof(inBuf));
 		fflush(stdout);
+
 		if (!fgets(inBuf, 80, stdin))
 		continue;
-    
 		sscanf(inBuf, "%s", command);
 		
 		if(!strcmp(command, "help")) { 
@@ -305,6 +306,7 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 			printf("post - show thinking\n");
 			printf("nopost - do not show thinking\n");
 			printf("new - start new game\n");
+			printf("setboard - set position using fen string\n");
 			printf("go - set computer thinking\n");
 			printf("depth x - set depth to x\n");
 			printf("time x - set thinking time to x seconds (depth still applies if set)\n");
@@ -313,6 +315,18 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 			printf("enter moves using b7b8q notation\n\n\n");
 			continue;
 		}
+    
+    if(!strcmp(command,"mirror"))
+    {
+      printboard(pos);
+      printf("Eval %d\n",evalposition(pos));
+      mirrorboard(pos);
+      printboard(pos);
+      printf("Eval : %d\n",evalposition(pos));
+      mirrorboard(pos);
+      continue;
+    }
+
     
 		if(!strcmp(command, "quit")) { 
 			info->quit = TRUE;
@@ -366,11 +380,18 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 			parse_fen(START_FEN, pos);
 			continue; 
 		}
-		
+    
+    if(!strcmp(command, "setboard")){
+      engineSide = BOTH;  
+      parse_fen(inBuf+9, pos); 
+      continue; 
+    }       
+			
 		if(!strcmp(command, "go")) { 
 			engineSide = pos->side;  
 			continue; 
 		}	
+    
 		
 		move = parsemove(inBuf, pos);	
 		if(move == NOMOVE) {

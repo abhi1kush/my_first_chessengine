@@ -177,6 +177,20 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
   if(incheck == TRUE)
     depth++;
 
+  int score = -INFINITE;
+
+  if(donull && !incheck && pos->ply && (pos->bigpce[pos->side] > 0) && depth >= 4)
+  {
+    makenullmove(pos);
+    score = -alphabeta(-beta,-beta+1,depth-4,pos,info,FALSE);
+    takenullmove(pos);
+    if(info->stopped == TRUE)
+      return 0;
+    if(score >= beta)
+      return beta;
+  }
+
+
   S_MOVELIST list[1];
   generateallmoves(pos,list);
 
@@ -184,8 +198,9 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
   int legal =0;
   int oldalpha = alpha;
   int bestmove = NOMOVE;
-  int score = -INFINITE;
   int pvmove = probepvtable(pos);
+  score = -INFINITE;
+
 
   if(pvmove != NOMOVE)
   {

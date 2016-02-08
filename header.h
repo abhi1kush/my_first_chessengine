@@ -198,6 +198,8 @@ extern int pieceval[13];
 extern int piececol[13];
 extern int piecepawn[13];
 
+extern const int mirror64[64];
+
 extern int filesbrd[SQ_NUM];
 extern int ranksbrd[SQ_NUM];
 
@@ -206,6 +208,12 @@ extern int pieceking[13];
 extern int piecerookqueen[13];
 extern int piecebishopqueen[13];
 
+extern u64 filebbmask[8];
+extern u64 rankbbmask[8];
+
+extern u64 blackpassedmask[64];
+extern u64 whitepassedmask[64];
+extern u64 isolatedmask[64];
 
 /* function */
 
@@ -244,7 +252,8 @@ extern void generateallcaps(const S_BOARD* ,S_MOVELIST *);
 //makemove.c
 extern int makemove(S_BOARD *pos,int move);
 extern void takemove(S_BOARD *pos);
-
+extern void makenullmove(S_BOARD *);
+extern void takenullmove(S_BOARD *);
 //validate.c
 extern int sqonboard(const int sq);
 extern int sidevalid(const int side);

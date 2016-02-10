@@ -14,7 +14,11 @@ int main()
   Allinit();
   S_BOARD pos[1];
   S_SEARCHINFO info[1];
-  initpvtable(pos->pvtable);
+  info->quit = FALSE;
+  pos->hashtable->ptble=NULL;
+  inithashtable(pos->hashtable,16);
+  setbuf(stdin,NULL);
+  setbuf(stdout,NULL);
 
   printf("Welcome to abhi_engine! type cons for console mode ...\n");
   char line[256];
@@ -51,7 +55,7 @@ int main()
     else if(!strncmp(line,"quit",4))
       break;
   }
-  free(pos->pvtable->ptable);
+  free(pos->hashtable->ptable);
   
   return 0;
 }

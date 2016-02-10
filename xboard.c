@@ -112,6 +112,7 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
   int timeLeft;   
   int sec;
   int mps;
+  int MB=16;
   int move = NOMOVE;  
   int i, score;
   char inBuf[80], command[80];  
@@ -189,7 +190,17 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
       time *= 10;
         printf("DEBUG time:%d\n",time);
       continue; 
-    }  
+    }
+
+    if(!strcmp(command,"memory"))
+    {
+      sscanf(inBuf,"memory %d",&MB);
+      if(MB < 4) MB = 4;
+      if(MB > 2048) MB = 2048;
+      printf("Set Hash to %d MB\n",MB);
+      inithashtable(pos->hashtable,MB);
+      continue;
+    }
 
 
 

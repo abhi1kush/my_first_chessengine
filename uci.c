@@ -115,12 +115,13 @@ void uci_loop(S_BOARD *pos, S_SEARCHINFO *info)
   setbuf(stdin,NULL);
   setbuf(stdout,NULL);
 
+  int MB=16;
   char line[INPUTBUFFER];
   printf("id name %s\n",NAME);
   printf("id author Bluefever\n");
   printf("uciok\n");
 
-  initpvtable(pos->pvtable);
+  //initpvtable(pos->pvtable);
 
   while(TRUE)
   {
@@ -153,6 +154,18 @@ void uci_loop(S_BOARD *pos, S_SEARCHINFO *info)
       printf("id name %s\n",NAME);
       printf("id author Abhi\n");
       printf("uciok\n");
+    }
+    else if(!strncmp(line,"debug",4))
+    {
+      DebugAnalysisTest(pos,info);
+    }
+    else if(!strncmp(line,"setoption name Hash value ",26))
+    {
+      sscanf(line,"%*s %*s %*s %d",&MB);
+      if(MB<4) MB = 4;
+      if(MB >2048) MB = 2048;
+      printf("Set Hash to %d MB\n",MB);
+      inithashtable(pos->hashtable,MB);
     }
     if(info->quit) break;
   }

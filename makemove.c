@@ -23,7 +23,7 @@
 #define HASH_CA (pos->poskey ^= (castlekeys[(pos->castle)]))
 #define HASH_SIDE (pos->poskey ^= (sidekey))
 #define HASH_EP (pos->poskey ^= (piecekeys[EMPTY][(pos->enpass)]))
-
+#define INCHECK (sqattacked(pos->kingsq[pos->side],pos->side^1,pos))
 // ca_perm  &= castleperm[from]
 
 const int castleperm[120] = {

@@ -7,7 +7,7 @@ int getpvline(const int depth, S_BOARD *pos)
 {
   ASSERT(depth<MAXDEPTH);
 
-  int move = probepvtable(pos);
+  int move = probepvmove(pos);
   int count = 0;
   while(move != NOMOVE && count < depth)
   {
@@ -20,7 +20,7 @@ int getpvline(const int depth, S_BOARD *pos)
     }
     else
       break;
-    move = probepvtable(pos);
+    move = probepvmove(pos);
   }
   
    while(pos->ply > 0)
@@ -33,46 +33,137 @@ int getpvline(const int depth, S_BOARD *pos)
 
 
 
-const int pvsize = 0x100000 * 2;
+const int hashsize = 0x100000 * 16;
 
-void clearpvtable(S_PVTABLE *table)
+void clearhashtable(S_HASHTABLE *table)
 {
-  S_PVENTRY *pventry;
-  for(pventry = table->ptable; pventry < table->ptable + table->numentries; pventry++)
+  S_HASHENTRY * tableentry;
+  for(tableentry = table->ptable; tableentry < table->ptable + table->numentries; tableentry++)
   {
-    pventry->poskey = 0ULL;
-    pventry->move = NOMOVE;
+    tableentry->poskey = 0ULL;
+    tableentry->move = NOMOVE;
+    tableentry->depth = 0;
+    tableentry->score = 0;
+    tableentry->flags = 0;
   }
-   
+  table->newwrite=0;  
 }
 
-void initpvtable(S_PVTABLE *table)
+void inithashtable(S_HASHTABLE *table,const int MB)
 {
-  table->numentries = pvsize/sizeof(S_PVENTRY);
+  int hashsize = 0x100000 * MB;
+  table->numentries = hashsize/sizeof(S_HASHENTRY);
   table->numentries -= 2;
-  table->ptable = (S_PVENTRY *)malloc(table->numentries*sizeof(S_PVENTRY));
-  clearpvtable(table);
-  printf("pvTable init complete with %d entries \n",table->numentries);
+  
+  if(table->ptable!=NULL)
+    free(table->ptable);
+
+  table->ptable = (S_HASHENTRY *)malloc(table->numentries*sizeof(S_HASHENTRY));
+  
+  if(table->ptable==NULL)
+  {
+    printf("hashTable Allocation failed, trying  %dMB ...\n",MB/2);
+    inithashtable(table,MB/2);
+  }
+  else
+  {
+    clearhashtable(table);
+    printf("HashTable init complete with %d entries \n",table->numentries);
+  }
 }
 
-void storepvmove(const S_BOARD *pos, const int move)
+void storehashentry(S_BOARD *pos, const int move,int score,const int flags,const depth)
 {
-  int i = pos->poskey % pos->pvtable->numentries;
-  ASSERT(i >= 0 && i <= pos->pvtable->numentries - 1);
+  int i = pos->poskey % pos->hashtable->numentries;
 
-  pos->pvtable->ptable[i].move = move;
-  pos->pvtable->ptable[i].poskey = pos->poskey;  
+  ASSERT(i >= 0 && i <= pos->hashtable->numentries - 1);
+  ASSERT(depth >= 1 && depth < MAXDEPTH);
+  ASSERT(flags >= HFALPHA && flags<=HFEXACT);
+  ASSERT(score >= -INFINITE && score <= INFINITE);
+  ASSERT(pos->ply >= 0 && pos->ply < MAXDEPTH);
 
+  if(pos->hashtable->ptable[i].poskey == 0)
+    pos->hashtable->newwrite++;
+  else
+    pos->hashtable->overwrite++;
+
+  if(score > ISMATE) 
+    score += pos->ply;
+  else if(score < -ISMATE)
+    score -=pos->ply;
+
+  pos->hashtable->ptable[i].move = move;
+  pos->hashtable->ptable[i].poskey = pos->poskey;
+  pos->hashtable->ptable[i].flags = flags;
+  pos->hashtable->ptable[i].score = score;
+  pos->hashtable->ptable[i].depth = depth;
+  
 }
 
-int probepvtable(const S_BOARD *pos)
+int probehashentry(S_BOARD *pos,int *move,int *score, int alpha,int beta,int depth)
 {
-  int i =pos->poskey % pos->pvtable->numentries;
-  ASSERT(i >= 0 && i <= pos->pvtable->numentries - 1);
+  int i =pos->poskey % pos->hashtable->numentries;
 
-  if(pos->pvtable->ptable[i].poskey == pos->poskey)
-    return pos->pvtable->ptable[i].move;
+  ASSERT(i >= 0 && i <= pos->hashtable->numentries - 1);
+  ASSERT(depth >= 1 && depth < MAXDEPTH );
+  ASSERT(alpha < beta);
+  ASSERT(alpha >= -INFINITE && alpha <= INFINITE);
+  ASSERT(beta >= -INFINITE && beta <= INFINITE);
+  ASSERT(pos->ply >= 0 && pos->ply < MAXDEPTH);
+
+  if(pos->hashtable->ptable[i].poskey == pos->poskey)
+  {
+    *move = pos->hashtable->ptable[i].move;
+    if(pos->hashtable->ptable[i].depth >= depth)
+    {
+      pos->hashtable->hit++;
+
+      ASSERT(pos->hashtable->ptable[i].depth >= 1 && pos->hashtable->ptable[i].depth < MAXDEPTH);
+      ASSERT(pos->hashtable->ptable[i].flags>=HFALPHA && pos->hashtable->ptable[i].flags <= HFEXACT);
+      
+      *score = pos->hashtable->ptable[i].score;
+      if(*score > ISMATE) 
+        *score -= pos->ply;
+      else if(*score < -ISMATE) 
+        *score += pos->ply;
+      
+      switch(pos->hashtable->ptable[i].flags)
+      {
+        ASSERT(*score >= -INFINITE && *score <= INFINITE);
+
+        case HFALPHA: if(*score <=alpha)
+                      {
+                        *score = alpha;
+                        return TRUE;
+                      }
+                      break;
+        case HFBETA: if(*score >= beta)
+                     {
+                       *score = beta;
+                       return TRUE;
+                     }
+                     break;
+        case HFEXACT:
+                     return TRUE;
+                     break;
+        default : ASSERT(FALSE);
+      }
+    }
+    return pos->hashtable->ptable[i].move;
+  }
   
   return NOMOVE;
 }
+
+int probepvmove(const S_BOARD *pos) 
+{
+    int i = pos->poskey % pos->hashtable->numentries;
+    ASSERT(i >= 0 && i <= pos->hashtable->numentries - 1);
+    if( pos->hashtable->ptable[i].poskey == pos->poskey ) 
+    {
+      return pos->hashtable->ptable[i].move;
+    }
+    return NOMOVE;
+}
+
 

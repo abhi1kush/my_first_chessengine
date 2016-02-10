@@ -72,20 +72,19 @@ const int KingE[64] = {
 
   -10,  0 , 10  , 10  , 10  , 10  , 0 , -10 ,
 
-  0 , 10  , 15  , 15  , 15  , 15  , 10  , 0 ,
+  0 , 10  , 20  , 20  , 20  , 20  , 10  , 0 ,
 
-  0 , 10  , 15  , 20  , 20  , 15  , 10  , 0 ,
+  0 , 10  , 20  , 40  , 40  , 20  , 10  , 0 ,
 
-  0 , 10  , 15  , 20  , 20  , 15  , 10  , 0 ,
+  0 , 10  , 20  , 40  , 40  , 20  , 10  , 0 ,
 
-  0 , 10  , 15  , 15  , 15  , 15  , 10  , 0 ,
+  0 , 10  , 20  , 20  , 20  , 20  , 10  , 0 ,
 
   -10,  0 , 10  , 10  , 10  , 10  , 0 , -10 ,
 
   -50 , -10 , 0 , 0 , 0 , 0 , -10 , -50 
 
 };
-
 
 
 const int KingO[64] = { 
@@ -145,7 +144,7 @@ int materialdraw(const S_BOARD *pos)
     return FALSE;
 }
 
-#define ENDGAME_MAT (1* pieceval[wr] + 2*pieceval[wn] + 3*pieceval[wp])
+#define ENDGAME_MAT (pieceval[wr] + 2*pieceval[wn] + 2*pieceval[wp])
 
 int evalposition(const S_BOARD *pos)
 {
@@ -283,6 +282,8 @@ int evalposition(const S_BOARD *pos)
   
   pce =wk;
   sq= pos->plist[pce][0];
+  ASSERT(sqonboard(sq));
+  ASSERT(SQ64(sq) >= 0 && SQ64(sq) <=63);
   
   if((pos->material[BLACK] <= ENDGAME_MAT))
     score += KingE[SQ64(sq)];
@@ -292,10 +293,13 @@ int evalposition(const S_BOARD *pos)
   pce =bk;
   sq = pos->plist[pce][0];
   
+  ASSERT(sqonboard(sq));
+  ASSERT(SQ64(sq) >= 0 && SQ64(sq) <=63);
+  
   if((pos->material[WHITE] <= ENDGAME_MAT))
-    score -= KingE[SQ64(sq)];
+    score -= KingE[mirror64[SQ64(sq)]];
   else
-    score -= KingO[SQ64(sq)];
+    score -= KingO[mirror64[SQ64(sq)]];
 
   if(pos->pceNum[wb] >= 2) score += bishoppair;
   if(pos->pceNum[bb] >= 2) score -= bishoppair;

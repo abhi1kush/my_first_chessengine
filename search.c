@@ -28,9 +28,13 @@ static void picknextmove(int movenum, S_MOVELIST *list)
       bestscore = list->moves[i].score;
       bestnum = i;
     }
-  temp = list->moves[movenum];
-  list->moves[movenum] = list->moves[bestnum];
-  list->moves[bestnum] = temp;
+    ASSERT(movenum >= 0 && movenum < list->count);
+    ASSERT(bestnum >= 0 && bestnum < list->count);
+    ASSERT(bestnum >= movenum);
+
+    temp = list->moves[movenum];
+    list->moves[movenum] = list->moves[bestnum];
+    list->moves[bestnum] = temp;
 }
 
 
@@ -50,7 +54,8 @@ static int isrepetition(const S_BOARD *pos)
 static int quiescence(int alpha, int beta, S_BOARD *pos,S_SEARCHINFO *info)
 {
   ASSERT(checkboard(pos));
-
+  ASSERT(beta>alpha);
+  
   if((info->nodes & 2047) == 0 )
     checkup(info);
 
@@ -65,7 +70,9 @@ static int quiescence(int alpha, int beta, S_BOARD *pos,S_SEARCHINFO *info)
     return evalposition(pos);
 
   int score = evalposition(pos);
-
+  
+  ASSERT(score>-INFINITE && score<INFINITE);
+  
   if(score >= beta)
     return beta;
 
@@ -78,9 +85,9 @@ static int quiescence(int alpha, int beta, S_BOARD *pos,S_SEARCHINFO *info)
   int movenum = 0;
   int legal =0;
   int oldalpha = alpha;
-  int bestmove = NOMOVE;
+  //int bestmove = NOMOVE;
   score = -INFINITE;
-  int pvmove = probepvtable(pos);
+  //int pvmove = probepvmove(pos);
   
   for(movenum=0; movenum < list->count; ++movenum)
   {
@@ -107,15 +114,12 @@ static int quiescence(int alpha, int beta, S_BOARD *pos,S_SEARCHINFO *info)
         return beta;
       }
       alpha = score;
-      bestmove = list->moves[movenum].move;
+      //bestmove = list->moves[movenum].move;
     }
   }
-  
-
-
-  if(alpha != oldalpha)
-    storepvmove(pos,bestmove);
-  
+  ASSERT(alpha >= oldalpha);
+  //if(alpha != oldalpha)
+    //storepvmove(pos,bestmove);
   return alpha;
 }
 
@@ -135,10 +139,14 @@ static void clearforsearch(S_BOARD *pos, S_SEARCHINFO *info)
     for(i2=0;i2<MAXDEPTH;i2++)
       pos->searchkillers[i][i2] = 0;
 
-  clearpvtable(pos->pvtable);
+  //clearpvtable(pos->pvtable);
+
+  pos->hashtable->overwrite=0;
+  pos->hashtable->hit=0;
+  pos->hashtable->cut=0;
   pos->ply=0;
 
-  //info->starttime = gettime();
+  //info->st arttime = gettime();
   info->stopped=0;
   info->nodes=0;
   info->fh =0;
@@ -150,7 +158,10 @@ static void clearforsearch(S_BOARD *pos, S_SEARCHINFO *info)
 static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *info, int donull)
 {
   ASSERT(checkboard(pos));
-  if(depth == 0)
+  ASSERT(beta>alpha);
+  ASSERT(depth>=0);
+  
+  if(depth <= 0)
   {
     return quiescence(alpha,beta,pos,info);
     //info->nodes++;
@@ -178,6 +189,13 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
     depth++;
 
   int score = -INFINITE;
+  int pvmove = NOMOVE;
+
+  if(probehashentry(pos,&pvmove,&score,alpha,beta,depth)==TRUE)
+  {
+    pos->hashtable->cut++;
+    return score; 
+  }
 
   if(donull && !incheck && pos->ply && (pos->bigpce[pos->side] > 0) && depth >= 4)
   {
@@ -186,8 +204,12 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
     takenullmove(pos);
     if(info->stopped == TRUE)
       return 0;
-    if(score >= beta)
+    
+    if(score >= beta && abs(score) < ISMATE )
+    {
+      info->nullcut++;
       return beta;
+    }
   }
 
 
@@ -198,7 +220,10 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
   int legal =0;
   int oldalpha = alpha;
   int bestmove = NOMOVE;
-  int pvmove = probepvtable(pos);
+  //int pvmove = probepvtable(pos);
+  
+  int bestscore = -INFINITE;
+  
   score = -INFINITE;
 
 
@@ -227,28 +252,36 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
     if(info->stopped == TRUE)
       return 0;
     
-    if(score > alpha)
+    if(score > bestscore)
     {
-      if(score >= beta)
-      {
-        if(legal ==1)
-          info->fhf++;
-        
-        info->fh++;
-
-        if(!(list->moves[movenum].move & MFLAGCAP))
+        bestscore = score;
+        bestmove = list->moves[movenum].move;
+        if(score > alpha)
         {
-          pos->searchkillers[1][pos->ply] = pos->searchkillers[0][pos->ply];
-          pos->searchkillers[0][pos->ply] = list->moves[movenum].move;
+          if(score >= beta)
+          {
+            if(legal ==1)
+              info->fhf++;
+            
+            info->fh++;
+
+            if(!(list->moves[movenum].move & MFLAGCAP))
+            {
+              pos->searchkillers[1][pos->ply] = pos->searchkillers[0][pos->ply];
+              pos->searchkillers[0][pos->ply] = list->moves[movenum].move;
+            }
+
+            storehashentry(pos,bestmove,beta,HFBETA,depth);
+
+            return beta;
+          }
+          alpha = score;
+          bestmove = list->moves[movenum].move;
+          if(!(list->moves[movenum].move & MFLAGCAP))
+          {
+              pos->searchhistory[pos->pieces[FROMSQ(bestmove)]][TOSQ(bestmove)] += depth;
+          }
         }
-        return beta;
-      }
-      alpha = score;
-      bestmove = list->moves[movenum].move;
-      if(!(list->moves[movenum].move & MFLAGCAP))
-      {
-          pos->searchhistory[pos->pieces[FROMSQ(bestmove)]][TOSQ(bestmove)] += depth;
-      }
     }
   }
 
@@ -259,10 +292,14 @@ static int alphabeta(int alpha,int beta,int depth, S_BOARD *pos , S_SEARCHINFO *
     else
       return 0;
   }
-
+  
+  ASSERT(alpha>=oldalpha);
+  
   if(alpha != oldalpha )
-    storepvmove(pos,bestmove);
-
+    storehashentry(pos,bestmove,bestscore,HFEXACT,depth);
+  else
+    storehashentry(pos,bestmove,alpha,HFALPHA,depth);
+  
   return alpha;
 }
 

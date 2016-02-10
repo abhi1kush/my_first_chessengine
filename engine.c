@@ -15,7 +15,8 @@ int main()
   S_BOARD pos[1];
   S_SEARCHINFO info[1];
   info->quit = FALSE;
-  pos->hashtable->ptble=NULL;
+  info->depth = SETDEPTH;
+  pos->hashtable->ptable=NULL;
   inithashtable(pos->hashtable,16);
   setbuf(stdin,NULL);
   setbuf(stdout,NULL);

@@ -30,10 +30,11 @@ u64 polykeyfromboard(S_BOARD *board)
 	int polypiece = 0;
 	int offset = 0;
 	
-	for(sq = 0; sq < BRD_SQ_NUM; ++sq) 
+	for(sq = 0; sq < SQ_NUM; ++sq) 
   {
 		piece = board->pieces[sq];
-		if(piece != NO_SQ && piece != EMPTY && piece != OFFBOARD) {
+		if(piece != NO_SQ && piece != EMPTY && piece != OFFBOARD) 
+    {
 			ASSERT(piece >= wp && piece <= bk);
 			polypiece = polykindofpiece[piece];
 			rank = ranksbrd[sq];

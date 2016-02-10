@@ -2,6 +2,7 @@
 #ifndef DEFS_H
 #define DEFS_H
 #include "stdlib.h"
+#include <stdio.h>
 
 #define DEBUG
 
@@ -26,6 +27,8 @@ typedef unsigned long long u64;
 #define MAXMOVES 2048
 #define MAXPOSITIONMOVES 256
 #define MAXDEPTH 64 
+#define MAX_HASH 2048
+#define SETDEPTH 6
 
 #define START_FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
@@ -302,5 +305,8 @@ extern void uci_loop(S_BOARD *pos, S_SEARCHINFO *info);
 //xboard.c
 extern void console_loop(S_BOARD *pos, S_SEARCHINFO *info);
 extern void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info);
+
+//polybook.c
+extern u64 polykeyfromboard(S_BOARD *);
 
 #endif

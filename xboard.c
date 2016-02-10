@@ -96,7 +96,7 @@ void printoptions() {
     printf("feature done=1\n");
 }
 
-void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info) 
+void xboard_loop(S_BOARD *pos,S_SEARCHINFO *info) 
 {
   info->GAME_MODE = XBOARDMODE;
   info->POST_THINKING = TRUE;
@@ -106,7 +106,7 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
   
   //printoptions(); // HACK
 
-  int depth = -1, movestogo[2] = {30,30 }, movetime = -1;
+  int depth = -1, movestogo[2] = {30,30}, movetime = -1;
   int time = -1, inc = 0;                             
   int engineSide = BOTH;                    
   int timeLeft;   
@@ -116,10 +116,9 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
   int move = NOMOVE;  
   int i, score;
   char inBuf[80], command[80];  
+  
   engineSide = BLACK; 
   parse_fen(START_FEN, pos);
-  depth = -1; 
-  time = -1;
 
   while(TRUE) 
   { 
@@ -128,6 +127,7 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
     {  
       info->starttime = gettime();
       info->depth = depth;
+      
       if(time != -1) 
       {
         info->timeset = TRUE;
@@ -135,29 +135,31 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
         time -= 50;   
         info->stoptime = info->starttime + time + inc;
       } 
+      
       if(depth == -1 || depth > MAXDEPTH) 
-      {
         info->depth = MAXDEPTH;
-      }
-      printf("time:%d start:%ld stop:%ld depth:%d timeset:%d movestogo:%d mps:%d\n",
-        time,info->starttime,info->stoptime,info->depth,info->timeset, movestogo[pos->side], mps);
+      
+      printf("time:%d start:%ld stop:%ld depth:%d timeset:%d movestogo:%d mps:%d\n",time,info->starttime,info->stoptime,info->depth,info->timeset, movestogo[pos->side], mps);
       searchposition(pos, info);
+      
       if(mps != 0) 
       {
         movestogo[pos->side^1]--;
         if(movestogo[pos->side^1] < 1) 
-        {
           movestogo[pos->side^1] = mps;
-        }
       }
     } 
-    fflush(stdout); 
+    fflush(stdout);
+
     memset(&inBuf[0], 0, sizeof(inBuf));
+
     fflush(stdout);
     if (!fgets(inBuf, 80, stdin))
     continue;
+
     sscanf(inBuf, "%s", command);
     printf("command seen:%s\n",inBuf);
+
     if(!strcmp(command, "quit")) 
     { 
       info->quit = TRUE;
@@ -169,26 +171,28 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
       continue; 
     } 
 
-    if(!strcmp(command, "protover")){
+    if(!strcmp(command, "protover"))
+    {
       printoptions();
-        continue;
+      continue;
     }
-
     if(!strcmp(command, "sd")) 
     {
       sscanf(inBuf, "sd %d", &depth); 
       printf("DEBUG depth:%d\n",depth);
       continue; 
     }
-    if(!strcmp(command, "st")) {
+    if(!strcmp(command, "st")) 
+    {
       sscanf(inBuf, "st %d", &movetime); 
-        printf("DEBUG movetime:%d\n",movetime);
+      printf("DEBUG movetime:%d\n",movetime);
       continue; 
     }      
-    if(!strcmp(command, "time")) {
+    if(!strcmp(command, "time")) 
+    {
       sscanf(inBuf, "time %d", &time); 
       time *= 10;
-        printf("DEBUG time:%d\n",time);
+      printf("DEBUG time:%d\n",time);
       continue; 
     }
 
@@ -196,21 +200,22 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
     {
       sscanf(inBuf,"memory %d",&MB);
       if(MB < 4) MB = 4;
-      if(MB > 2048) MB = 2048;
+      if(MB > MAX_HASH) MB = MAX_HASH;
       printf("Set Hash to %d MB\n",MB);
       inithashtable(pos->hashtable,MB);
       continue;
     }
 
-
-
     if(!strcmp(command, "level")) {
       sec = 0;
       movetime = -1;
-      if( sscanf(inBuf, "level %d %d %d", &mps, &timeLeft, &inc) != 3) {
+      if(sscanf(inBuf, "level %d %d %d", &mps, &timeLeft, &inc) != 3) 
+      {
         sscanf(inBuf, "level %d %d:%d %d", &mps, &timeLeft, &sec, &inc);
-          printf("DEBUG level with :\n");
-      } else {
+        printf("DEBUG level with :\n");
+      } 
+      else 
+      {
           printf("DEBUG level without :\n");
       }     
 
@@ -221,18 +226,18 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
         movestogo[0] = movestogo[1] = mps;
       }
       time = -1;
-        printf("DEBUG level timeLeft:%d movesToGo:%d inc:%d mps%d\n",timeLeft,movestogo[0],inc,mps);
+      printf("DEBUG level timeLeft:%d movesToGo:%d inc:%d mps%d\n",timeLeft,movestogo[0],inc,mps);
       continue; 
     }     
-
-    
 
     if(!strcmp(command, "ping")) { 
       printf("pong%s\n", inBuf+4); 
       continue; 
     }
 
-    if(!strcmp(command, "new")) { 
+    if(!strcmp(command, "new")) 
+    { 
+      clearhashtable(pos->hashtable);
       engineSide = BLACK; 
       parse_fen(START_FEN, pos);
       depth = -1; 
@@ -251,13 +256,21 @@ void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info)
       continue; 
     }   
 
-    if(!strcmp(command, "usermove")){
+    if(!strcmp(command, "usermove"))
+    {
       movestogo[pos->side]--;
       move = parsemove(inBuf+9, pos); 
       if(move == NOMOVE) continue;
       makemove(pos, move);
-            pos->ply=0;
-    }    
+      pos->ply=0;
+    }
+
+    if(!strcmp(command,"polykey"))
+    {
+      printboard(pos);
+      printf("polykey %llx\n",polykeyfromboard(pos));
+      continue;
+    }
   } 
 }
 
@@ -364,19 +377,25 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 			continue; 
 		} 
 		
-		if(!strcmp(command, "view")) {
-			if(depth == MAXDEPTH) printf("depth not set ");
-			else printf("depth %d",depth);
+		if(!strcmp(command, "view")) 
+    {
+			if(depth == MAXDEPTH) 
+        printf("depth not set ");
+			else 
+        printf("depth %d",depth);
 			
-			if(movetime != 0) printf(" movetime %ds\n",movetime/1000);
-			else printf(" movetime not set\n");
-			
+			if(movetime != 0) 
+        printf(" movetime %ds\n",movetime/1000);
+			else 
+        printf(" movetime not set\n");
 			continue; 
 		}
 		
-		if(!strcmp(command, "depth")) {
+		if(!strcmp(command, "depth")) 
+    {
 			sscanf(inBuf, "depth %d", &depth); 
-		    if(depth==0) depth = MAXDEPTH;
+		  if(depth==0) 
+        depth = MAXDEPTH;
 			continue; 
 		}
 		
@@ -387,7 +406,8 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 		} 
 		
 		if(!strcmp(command, "new")) { 
-			engineSide = BLACK; 
+			clearhashtable(pos->hashtable);
+      engineSide = BLACK; 
 			parse_fen(START_FEN, pos);
 			continue; 
 		}
@@ -403,14 +423,14 @@ void console_loop(S_BOARD *pos, S_SEARCHINFO *info) {
 			continue; 
 		}	
     
-		
 		move = parsemove(inBuf, pos);	
-		if(move == NOMOVE) {
+		if(move == NOMOVE) 
+    {
 			printf("Command unknown:%s\n",inBuf);
 			continue;
 		}
 		makemove(pos, move);
-
-    }	
+    pos->ply=0;
+  }	
 }
 

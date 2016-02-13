@@ -28,6 +28,7 @@ u64 blackpassedmask[64];
 u64 whitepassedmask[64];
 u64 isolatedmask[64];
 
+S_OPTIONS engineoptions[1];
 /*
  0 0 0 1 1 1 0 0
  0 0 0 1 1 1 0 0
@@ -216,5 +217,6 @@ void Allinit()
   initfilesranksbrd();
   initevalmasks();
   InitMvvLva();
+  initpolybook();
 }
 

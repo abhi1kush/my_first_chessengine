@@ -112,14 +112,19 @@ void parseposition(char * linein, S_BOARD *pos)
 
 void uci_loop(S_BOARD *pos, S_SEARCHINFO *info)
 {
+  info->GAME_MODE = UCIMODE;
+
   setbuf(stdin,NULL);
   setbuf(stdout,NULL);
 
-  int MB=16;
   char line[INPUTBUFFER];
   printf("id name %s\n",NAME);
-  printf("id author Bluefever\n");
+  printf("id author abhi\n");
+  printf("option name Hash type spin default 64 min 4 max %d\n",MAX_HASH);
+  printf("option name Book type check default truen\n");
   printf("uciok\n");
+  
+  int MB=64;
 
   //initpvtable(pos->pvtable);
 
@@ -161,11 +166,24 @@ void uci_loop(S_BOARD *pos, S_SEARCHINFO *info)
     }
     else if(!strncmp(line,"setoption name Hash value ",26))
     {
-      sscanf(line,"%*s %*s %*s %d",&MB);
+      sscanf(line,"%*s %*s %*s %*s %d",&MB);
       if(MB<4) MB = 4;
-      if(MB >2048) MB = 2048;
+      if(MB >MAX_HASH) MB = MAX_HASH;
       printf("Set Hash to %d MB\n",MB);
       inithashtable(pos->hashtable,MB);
+    }
+    else if(!strncmp(line,"setoption name Book value ",26))
+    {
+      char *ptrTrue = NULL;
+      ptrTrue = strstr(line,"true");
+      if(ptrTrue != NULL)
+      {
+        engineoptions->usebook = TRUE;
+      }
+      else
+      {
+        engineoptions->usebook = FALSE;
+      }
     }
     if(info->quit) break;
   }

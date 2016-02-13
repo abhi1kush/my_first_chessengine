@@ -33,7 +33,6 @@ int getpvline(const int depth, S_BOARD *pos)
 
 
 
-const int hashsize = 0x100000 * 16;
 
 void clearhashtable(S_HASHTABLE *table)
 {

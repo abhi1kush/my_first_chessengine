@@ -35,6 +35,8 @@ int drawmaterial(const S_BOARD *pos)
 
 int checkresult(S_BOARD *pos)
 {
+  ASSERT(checkboard(pos));
+  
   if(pos->fiftymove >100)
   {
     printf("1/2-1/2 {fifty move rule (claimed by abhi_engine)\n}");
@@ -46,6 +48,7 @@ int checkresult(S_BOARD *pos)
     printf("1/2-1/2 {3-fold repetition (claimed byabhi_engine)\n}");
     return TRUE;
   }
+  
   if(drawmaterial(pos)==TRUE)
   {
     printf("1/2-1/2 {insufficient material (claimed by abhi_engine)}\n");
@@ -78,7 +81,7 @@ int checkresult(S_BOARD *pos)
     }
     else
     {
-      printf("0-1 {white mates (claimed by abhi_engine)}\n");
+      printf("1-0 {white mates (claimed by abhi_engine)}\n");
       return TRUE;
     }
   }
@@ -91,7 +94,8 @@ int checkresult(S_BOARD *pos)
 }
 
 
-void printoptions() {
+void printoptions() 
+{
     printf("feature ping=1 setboard=1 colors=0 usermove=1\n");      
     printf("feature done=1\n");
 }
@@ -104,7 +108,7 @@ void xboard_loop(S_BOARD *pos,S_SEARCHINFO *info)
   setbuf(stdin, NULL);
   setbuf(stdout, NULL);
   
-  //printoptions(); // HACK
+  printoptions(); // HACK
 
   int depth = -1, movestogo[2] = {30,30}, movetime = -1;
   int time = -1, inc = 0;                             
@@ -114,7 +118,7 @@ void xboard_loop(S_BOARD *pos,S_SEARCHINFO *info)
   int mps;
   int MB=16;
   int move = NOMOVE;  
-  int i, score;
+  //int i, score;
   char inBuf[80], command[80];  
   
   engineSide = BLACK; 
@@ -139,7 +143,7 @@ void xboard_loop(S_BOARD *pos,S_SEARCHINFO *info)
       if(depth == -1 || depth > MAXDEPTH) 
         info->depth = MAXDEPTH;
       
-      printf("time:%d start:%ld stop:%ld depth:%d timeset:%d movestogo:%d mps:%d\n",time,info->starttime,info->stoptime,info->depth,info->timeset, movestogo[pos->side], mps);
+      printf("time:%5d start:%5ld stop:%5ld depth:%5d timeset:%5d movestogo:%5d mps:%5d\n",time,info->starttime,info->stoptime,info->depth,info->timeset, movestogo[pos->side], mps);
       searchposition(pos, info);
       
       if(mps != 0) 
@@ -155,7 +159,7 @@ void xboard_loop(S_BOARD *pos,S_SEARCHINFO *info)
 
     fflush(stdout);
     if (!fgets(inBuf, 80, stdin))
-    continue;
+      continue;
 
     sscanf(inBuf, "%s", command);
     printf("command seen:%s\n",inBuf);
@@ -255,22 +259,25 @@ void xboard_loop(S_BOARD *pos,S_SEARCHINFO *info)
       engineSide = pos->side;  
       continue; 
     }   
+    
+    if(!strcmp(command,"polykey"))
+    {
+      printboard(pos);
+      //printf("polykey %llx\n",polykeyfromboard(pos));
+      getbookmove(pos);
+      continue;
+    }
 
     if(!strcmp(command, "usermove"))
     {
       movestogo[pos->side]--;
       move = parsemove(inBuf+9, pos); 
-      if(move == NOMOVE) continue;
+      if(move == NOMOVE) 
+        continue;
       makemove(pos, move);
       pos->ply=0;
     }
 
-    if(!strcmp(command,"polykey"))
-    {
-      printboard(pos);
-      printf("polykey %llx\n",polykeyfromboard(pos));
-      continue;
-    }
   } 
 }
 

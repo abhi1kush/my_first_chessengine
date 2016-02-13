@@ -317,6 +317,7 @@ void searchposition(S_BOARD *pos, S_SEARCHINFO *info)
   int currentdepth =0;
   int pvmoves = 0;
   int pvnum =0;
+  
   clearforsearch(pos,info);
    
   // iterative deepening
@@ -335,18 +336,21 @@ void searchposition(S_BOARD *pos, S_SEARCHINFO *info)
     if(info->GAME_MODE == UCIMODE)
        printf("info score cp %5d depth %3d nodes %10ld time %5ld ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
     else if(info->GAME_MODE == XBOARDMODE && info->POST_THINKING == TRUE)
-      printf("%d %d %ld %ld",currentdepth,bestscore,(gettime()-info->starttime)/10,info->nodes);
+      ;//printf("%5d %5d %5ld %5ld",currentdepth,bestscore,(gettime()-info->starttime)/10,info->nodes);
     else if(info->POST_THINKING == TRUE)
-       printf("score %5d depth %3d nodes %10ld time %5ld ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
+       printf("score %5d depth %3d nodes %10ld time %5ld(ms) ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
     
     if(info->GAME_MODE == UCIMODE || info->POST_THINKING == TRUE)
     {
       pvmoves = getpvline(currentdepth,pos);
-      printf("pv");
+      if(!info->GAME_MODE == XBOARDMODE)
+      {
+        printf("pv");
+      
       for(pvnum=0;pvnum < pvmoves;pvnum++)
         printf(" %5s",prmove(pos->pvarray[pvnum]));
       printf("\n");
-    //printf("Ordering:%2f\n",(info->fhf/info->fh));
+      }
     }
   }
   

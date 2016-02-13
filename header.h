@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include <stdio.h>
 
-#define DEBUG
+//#define DEBUG
 
 #ifndef DEBUG
 #define ASSERT(n)
@@ -152,6 +152,11 @@ typedef struct {
 
 }S_SEARCHINFO;
 
+typedef struct {
+  int usebook; 
+}S_OPTIONS;
+
+
 /*GAME MOVE*/
 /*                          7    f
 0000 0000 0000 0000 0000 0111 1111 -> from  0x7f
@@ -229,6 +234,7 @@ extern u64 rankbbmask[8];
 extern u64 blackpassedmask[64];
 extern u64 whitepassedmask[64];
 extern u64 isolatedmask[64];
+extern S_OPTIONS engineoptions[1];
 
 /* function */
 
@@ -307,6 +313,9 @@ extern void console_loop(S_BOARD *pos, S_SEARCHINFO *info);
 extern void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info);
 
 //polybook.c
-extern u64 polykeyfromboard(S_BOARD *);
+extern u64 polykeyfromboard(const S_BOARD *);
+extern void initpolybook();
+extern void cleanpolybook();
+extern void getbookmove(S_BOARD * board);
 
 #endif

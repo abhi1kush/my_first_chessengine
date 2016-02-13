@@ -8,7 +8,7 @@
 #define FEN6 "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1"
 #define MATE "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - -"
 
-int main()
+int main(int argc,char *argv[])
 { 
 
   Allinit();
@@ -17,9 +17,20 @@ int main()
   info->quit = FALSE;
   info->depth = SETDEPTH;
   pos->hashtable->ptable=NULL;
-  inithashtable(pos->hashtable,16);
+  inithashtable(pos->hashtable,64);
   setbuf(stdin,NULL);
   setbuf(stdout,NULL);
+
+  int argnum =0;
+
+  for(argnum = 0; argnum < argc; argnum++)
+  {
+    if(strncmp(argv[argnum],"NoBook",6)==0)
+    {
+      engineoptions->usebook = FALSE;
+      printf("Book Off\n");
+    }
+  }
 
   printf("Welcome to abhi_engine! type cons for console mode ...\n");
   char line[256];
@@ -57,6 +68,7 @@ int main()
       break;
   }
   free(pos->hashtable->ptable);
+  cleanpolybook();
   
   return 0;
 }

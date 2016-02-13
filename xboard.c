@@ -259,15 +259,14 @@ void xboard_loop(S_BOARD *pos,S_SEARCHINFO *info)
       engineSide = pos->side;  
       continue; 
     }   
-    
-    if(!strcmp(command,"polykey"))
+   /* 
+    if(!strcmp(command,"bookmove"))
     {
       printboard(pos);
-      //printf("polykey %llx\n",polykeyfromboard(pos));
-      getbookmove(pos);
+      printf("BookMove %s \n",getbookmove(pos);
       continue;
     }
-
+*/
     if(!strcmp(command, "usermove"))
     {
       movestogo[pos->side]--;

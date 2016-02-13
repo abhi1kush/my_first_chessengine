@@ -319,37 +319,44 @@ void searchposition(S_BOARD *pos, S_SEARCHINFO *info)
   int pvnum =0;
   
   clearforsearch(pos,info);
-   
-  // iterative deepening
-  for(currentdepth = 1; currentdepth <= info->depth; currentdepth++)
+
+  if(engineoptions->usebook == TRUE)
   {
-    //alpha beta
-    bestscore = alphabeta(-INFINITE,INFINITE,currentdepth,pos,info,TRUE);
-    
-    // out of time?
-    if(info->stopped == TRUE)
-      break;
-
-    pvmoves = getpvline(currentdepth,pos);
-    bestmove = pos->pvarray[0];
-
-    if(info->GAME_MODE == UCIMODE)
-       printf("info score cp %5d depth %3d nodes %10ld time %5ld ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
-    else if(info->GAME_MODE == XBOARDMODE && info->POST_THINKING == TRUE)
-      ;//printf("%5d %5d %5ld %5ld",currentdepth,bestscore,(gettime()-info->starttime)/10,info->nodes);
-    else if(info->POST_THINKING == TRUE)
-       printf("score %5d depth %3d nodes %10ld time %5ld(ms) ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
-    
-    if(info->GAME_MODE == UCIMODE || info->POST_THINKING == TRUE)
+    bestmove = getbookmove(pos);
+  }
+   
+  if(bestmove == NOMOVE)
+  {
+    // iterative deepening
+    for(currentdepth = 1; currentdepth <= info->depth; currentdepth++)
     {
-      pvmoves = getpvline(currentdepth,pos);
-      if(!info->GAME_MODE == XBOARDMODE)
-      {
-        printf("pv");
+      //alpha beta
+      bestscore = alphabeta(-INFINITE,INFINITE,currentdepth,pos,info,TRUE);
       
-      for(pvnum=0;pvnum < pvmoves;pvnum++)
-        printf(" %5s",prmove(pos->pvarray[pvnum]));
-      printf("\n");
+      // out of time?
+      if(info->stopped == TRUE)
+        break;
+
+      pvmoves = getpvline(currentdepth,pos);
+      bestmove = pos->pvarray[0];
+
+      if(info->GAME_MODE == UCIMODE)
+         printf("info score cp %5d depth %3d nodes %10ld time %5ld ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
+      else if(info->GAME_MODE == XBOARDMODE && info->POST_THINKING == TRUE)
+        printf("%5d %5d %5ld %5ld",currentdepth,bestscore,(gettime()-info->starttime)/10,info->nodes);
+      else if(info->POST_THINKING == TRUE)
+         printf("score %5d depth %3d nodes %10ld time %5ld(ms) ",bestscore,currentdepth,info->nodes,gettime()-info->starttime);
+      
+      if(info->GAME_MODE == UCIMODE || info->POST_THINKING == TRUE)
+      {
+        pvmoves = getpvline(currentdepth,pos);
+        if(!info->GAME_MODE == XBOARDMODE)
+          printf("pv");
+        
+        for(pvnum=0;pvnum < pvmoves;pvnum++)
+          printf(" %5s",prmove(pos->pvarray[pvnum]));
+        printf("\n");
+        
       }
     }
   }

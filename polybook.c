@@ -169,15 +169,17 @@ int ConvertPolyMoveToInternalMove(int polyMove, S_BOARD *board)
 
 }
 
-void listbookmoves(u64 polykey,S_BOARD *board)
+int getbookmove(S_BOARD *board)
 {
   int i = 0;
   S_POLY_BOOK_ENTRY * entry;
   unsigned short move;
   const int MAXBOOKMOVES = 32;
   int bookmoves[MAXBOOKMOVES];
-  int tempMove;
+  int tempMove = NOMOVE;
   int count = 0;
+  
+  u64 polykey = polykeyfromboard(board);
 
   for(entry = entries; entry < entries + numentries; entry++)
   {
@@ -200,62 +202,14 @@ void listbookmoves(u64 polykey,S_BOARD *board)
       */
     }
   }
-  printf("Listing Book Moves:\n");  
-  for(i =0;i < count ; i++)
-    printf("BookMove :%d : %s\n",i+1,prmove(bookmoves[i]));
+  if(count != 0)
+  {
+    int randmove = rand() % count;
+    return bookmoves[randmove];
+  }
+  else
+    return NOMOVE;
+   
 
 }
-
-void getbookmove(S_BOARD * board)
-{
-  u64 polykey = polykeyfromboard(board);
-  printf("polykey :%llx\n",polykey);
-  listbookmoves(polykey,board);
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

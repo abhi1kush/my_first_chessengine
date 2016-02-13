@@ -316,6 +316,6 @@ extern void xboard_loop(S_BOARD *pos, S_SEARCHINFO *info);
 extern u64 polykeyfromboard(const S_BOARD *);
 extern void initpolybook();
 extern void cleanpolybook();
-extern void getbookmove(S_BOARD * board);
+extern int getbookmove(S_BOARD * board);
 
 #endif

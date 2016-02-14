@@ -38,7 +38,7 @@ void initpolybook()
 
     size_t returnValue;
     returnValue = fread(entries,sizeof(S_POLY_BOOK_ENTRY),numentries,pFile); 
-    printf("fread() %ld Entries Read in from file\n",returnValue);
+    printf("fread() %zu Entries Read in from file\n",returnValue);
     if(numentries > 0)
       engineoptions->usebook = TRUE;
 
